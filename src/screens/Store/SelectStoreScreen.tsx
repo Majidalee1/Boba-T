@@ -1,45 +1,50 @@
-import { FlatList, Pressable, ScrollView, View, ViewStyle } from "react-native";
-import { Link, RouteProp, useRoute } from "@react-navigation/native";
+import { RouteProp } from "@react-navigation/native";
+import {
+  FlatList,
+  ScrollView,
+  TouchableHighlight,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from "react-native";
 
-import { Header } from "../../components/Header";
-import { DeviceHeight, DeviceWidth, spacing } from "../../utils/Layouts";
-import { Card, Icon, Text } from "@rneui/themed";
-import { AvailableStores } from "../../utils/Models";
-import { ProductCard } from "../../components/ProductCard";
-import { StoreCard } from "./components/StoreItem";
-import {
-  AppStackParamList,
-  HomeScreenNavigationProps,
-  StoreScrenNavigationProps,
-} from "../../navigation/AppNavigator";
 import { NavigationProp } from "@react-navigation/native";
-import {
-  StackNavigationOptions,
-  StackScreenProps,
-} from "@react-navigation/stack";
+import { Text } from "@rneui/themed";
+import { Header } from "../../components/Header";
+import { AppStackParamList } from "../../navigation/AppNavigator";
+import { DeviceHeight } from "../../utils/Layouts";
+import { AvailableStores } from "../../utils/Models";
+import { StoreCard } from "./components/StoreItem";
+import { colors } from "../../styles/colors";
+import { useState } from "react";
 
 const $container: ViewStyle = {
   flex: 1,
   alignItems: "center",
   justifyContent: "flex-start",
   backgroundColor: "#fff",
+  paddingTop: 20,
 };
 const $flatListContentContainer: ViewStyle = {
-  paddingHorizontal: spacing.extraSmall,
-  paddingBottom: spacing.extraSmall,
+  paddingHorizontal: 0,
+  paddingVertical: 0,
+  marginHorizontal: 0,
+  marginVertical: 0,
 };
 
 interface Props {
-  navigation: NavigationProp<StackNavigationOptions>;
+  navigation: NavigationProp<AppStackParamList>;
   route: RouteProp<AppStackParamList, "Store">;
 }
 
 export const Stores = (props: Props) => {
   const { navigation } = props;
 
+  // selected index
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
   return (
     <View style={$container}>
-      <Header />
       <View
         style={{
           alignItems: "flex-start",
@@ -53,56 +58,64 @@ export const Stores = (props: Props) => {
         }}
       >
         <Text
-          h5="true"
-          h5Style={{
+          h4={true}
+          h4Style={{
             fontWeight: "bold",
             elevation: 1,
-            padding: 10,
+
+            color: colors.text_primary,
           }}
         >
           Hello John!
         </Text>
         <Text
-          h4="true"
+          h4={true}
           h4Style={{
             fontWeight: "bold",
             elevation: 1,
             marginTop: 10,
+            color: colors.primary,
           }}
         >
           Choose A shop To Order your Bubble Tea
         </Text>
       </View>
-      <ScrollView
-        style={{
-          width: "100%",
-          height: DeviceHeight * 0.8,
+
+      <FlatList
+        data={AvailableStores(20)}
+        scrollEnabled={true}
+        renderItem={({ item, index, separators }) => (
+          <TouchableOpacity
+            key={item.id}
+            onPress={() => {
+              setSelectedIndex(index);
+              navigation.navigate("Home", {
+                storeId: item.id,
+              });
+            }}
+          >
+            <StoreCard
+              title={item.name}
+              address={item.address}
+              icon={item.icon}
+              isSelected={index === selectedIndex}
+            />
+          </TouchableOpacity>
+        )}
+        keyExtractor={(item) => item.id}
+        numColumns={2}
+        bounces={true}
+        columnWrapperStyle={{}}
+        getItemLayout={(data, index) => ({
+          length: AvailableStores.length,
+          offset: AvailableStores.length * index,
+          index,
+        })}
+        contentContainerStyle={{
+          backgroundColor: colors.secondary,
+          borderRadius: 10,
         }}
-      >
-        <FlatList
-          data={AvailableStores(200)}
-          renderItem={({ item }) => (
-            <Pressable
-              onPress={() => {
-                console.log("Pressed");
-                navigation.navigate("Home", {
-                  storeId: item.id,
-                });
-              }}
-            >
-              <StoreCard
-                title={item.name}
-                address={item.address}
-                icon={item.icon}
-              />
-            </Pressable>
-          )}
-          keyExtractor={(item) => item.id}
-          numColumns={2}
-          bounces={true}
-          contentContainerStyle={$flatListContentContainer}
-        ></FlatList>
-      </ScrollView>
+      ></FlatList>
     </View>
   );
 };

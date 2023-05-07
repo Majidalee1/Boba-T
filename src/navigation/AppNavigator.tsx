@@ -6,6 +6,8 @@ import { ProductDetails } from "../screens/ProductDetails/ProductDetails";
 import { LoginScreen } from "../screens/Auth/Login";
 import { NavigationContainer } from "@react-navigation/native";
 import { Stores } from "../screens/Store/SelectStoreScreen";
+import { CartScreen } from "../screens/Cart/CartScreen";
+import { CustomTeaScreen } from "../screens/CustomTea/CustomTeaScreen";
 
 export type AppStackParamList = {
   Store: undefined;
@@ -16,7 +18,11 @@ export type AppStackParamList = {
     productId: string;
   };
   CheckOut: undefined;
-  Cart: undefined;
+  Cart: {
+    storeId: string;
+    cartId?: string;
+  };
+  CustomTea: undefined;
 };
 
 const NavigationStack = createNativeStackNavigator<AppStackParamList>();
@@ -24,13 +30,13 @@ const NavigationStack = createNativeStackNavigator<AppStackParamList>();
 // navigation screen props
 
 export type NavigationScreenProps<T extends keyof AppStackParamList> = {
-  navigation: AppStackParamList[T] extends undefined
-    ? {
-        navigate: (screen: T) => void;
-      }
-    : {
-        navigate: (screen: T, params: AppStackParamList[T]) => void;
-      };
+  navigation: {
+    navigate: (
+      screen: keyof AppStackParamList,
+      params?: AppStackParamList[keyof AppStackParamList]
+    ) => void;
+    goBack: () => void;
+  };
   route: {
     params: AppStackParamList[T];
   };
@@ -39,6 +45,7 @@ export type NavigationScreenProps<T extends keyof AppStackParamList> = {
 export type HomeScreenNavigationProps = NavigationScreenProps<"Home">;
 export type ProductDetailsNavigationProps = NavigationScreenProps<"Details">;
 export type StoreScrenNavigationProps = NavigationScreenProps<"Store">;
+export type CartScreenNavigationProps = NavigationScreenProps<"Cart">;
 
 export const Stack = () => {
   return (
@@ -51,7 +58,23 @@ export const Stack = () => {
       }}
       initialRouteName="Store"
     >
-      <NavigationStack.Screen name="Home" component={HomeScreen} />
+      {/* CustomTeaScreen */}
+      <NavigationStack.Screen name="CustomTea" component={CustomTeaScreen} />
+      <NavigationStack.Screen
+        name="Cart"
+        initialParams={{
+          cartId: "1",
+          storeId: "1",
+        }}
+        component={CartScreen}
+      />
+      <NavigationStack.Screen
+        name="Home"
+        component={HomeScreen}
+        initialParams={{
+          storeId: "1",
+        }}
+      />
       <NavigationStack.Screen
         name="Details"
         component={ProductDetails}
@@ -92,8 +115,20 @@ export const AuthStack = () => {
 export const AppNavigator = () => {
   const user = true;
   return (
-    <NavigationContainer>
-      {user ? <Stack /> : <AuthStack />}
+    <NavigationContainer
+      theme={{
+        dark: false,
+        colors: {
+          primary: "#FBFCFF",
+          background: "#FBFCFF",
+          card: "#FBFCFF",
+          text: "#FBFCFF",
+          border: "#FBFCFF",
+          notification: "#FBFCFF",
+        },
+      }}
+    >
+      <Stack></Stack>
     </NavigationContainer>
   );
 };

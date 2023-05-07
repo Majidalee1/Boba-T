@@ -1,56 +1,65 @@
-import { Card, Icon, Text } from "@rneui/themed";
+import { Card, Icon, Image, ListItem, Text } from "@rneui/themed";
 import { DeviceHeight, DeviceWidth } from "../../../utils/Layouts";
+import { View } from "react-native";
 
 export type ProductCardProps = {
   title: string;
   address: string;
   icon?: string;
+  isSelected: boolean;
 };
 
 export const StoreCard = (props: ProductCardProps) => {
-  const { title, address, icon = "heart" } = props;
+  const { title, address, icon = "heart", isSelected = false } = props;
   return (
-    <Card
-      wrapperStyle={{
+    <View
+      style={{
+        width: DeviceWidth * 0.45,
+        height: DeviceWidth * 0.45,
+        padding: 20,
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-evenly",
         alignItems: "flex-start",
-      }}
-      containerStyle={{
-        width: DeviceWidth * 0.4,
-        height: DeviceHeight * 0.25,
+        justifyContent: "space-between",
+        marginVertical: 10,
+        marginHorizontal: 10,
         borderRadius: 10,
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
         elevation: 1,
+        backgroundColor: isSelected ? "#4FB8E9" : "#fff",
       }}
     >
       <Icon
-        name="heart"
-        color="#89CFF0"
+        name="heartbeat"
         type="font-awesome"
-        style={{
-          paddingBottom: 30,
-        }}
+        size={34}
+        color={isSelected ? "#fff" : "#4FB8E9"}
+        onPress={() => console.log("hello")}
       />
       <Text
-        h6="true"
-        h6Style={{
+        h4={true}
+        h4Style={{
           fontWeight: "bold",
-          elevation: 1,
-        }}
-        style={{
-          paddingBottom: 10,
+          color: isSelected ? "#fff" : "#323232",
+          fontSize: 16,
         }}
       >
         {title}
       </Text>
       <Text
-        style={{
-          fontSize: 18,
+        h4={true}
+        h4Style={{
+          fontWeight: "bold",
+          color: isSelected ? "#fff" : "#646464",
+          fontSize: 14,
         }}
       >
         {address}
       </Text>
-    </Card>
+    </View>
   );
 };
