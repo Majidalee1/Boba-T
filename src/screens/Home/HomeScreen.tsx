@@ -86,7 +86,6 @@ export const HomeScreen = ({ navigation, route }: Props) => (
         paddingHorizontal: 20,
         paddingVertical: 4,
         marginVertical: 10,
-
         borderRadius: 10,
         backgroundColor: colors.text_secondary,
         justifyContent: "flex-start",

@@ -20,12 +20,13 @@ import {
 import { colors } from "./../../styles/colors";
 import { DeviceHeight, DeviceWidth, spacing } from "../../utils/Layouts";
 
-import { GenerateCartItems } from "../../utils/Models";
+import { GenerateCartItems, ICartItem } from "../../utils/Models";
 import { CartItem } from "./components/CartItem";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import QRCode from "react-native-qrcode-svg";
 import { faker } from "@faker-js/faker";
 import { RowContainer } from "../../components/RowContainer";
+import AsyncStorageService from "../../services/Storage";
 
 export interface Props {
   navigation: NavigationProp<AppStackParamList>;
@@ -33,6 +34,23 @@ export interface Props {
 }
 export const CartScreen = ({ navigation, route }: Props) => {
   const [isDialogVisible, setIsDialogVisible] = useState<boolean>(false);
+
+  // get cart items from storage
+  const [CartItems, setCartItems] = useState<ICartItem[]>([]);
+  async function getCartItems() {
+    const cartItems = await AsyncStorageService.getItem("cart");
+    setCartItems(cartItems ? cartItems : []);
+  }
+
+  const removeCartItem = async (id: string) => {
+    const newCartItems = CartItems.filter((item) => item.id !== id);
+    await AsyncStorageService.setItem("cart", newCartItems);
+    setCartItems(newCartItems);
+  };
+
+  useEffect(() => {
+    getCartItems();
+  }, []);
 
   return (
     <View
@@ -57,22 +75,21 @@ export const CartScreen = ({ navigation, route }: Props) => {
           alignSelf: "center",
         }}
       >
-        Cart Items (40)
+        {CartItems.length}
       </Text>
       <FlatList
         style={{ maxHeight: DeviceHeight * 0.8 }}
-        data={GenerateCartItems({
-          quantity: 4,
-          cart_id: route.params.storeId,
-        })}
+        data={CartItems}
         scrollEnabled={true}
         keyExtractor={(item) => item.id!}
         renderItem={({ item, index, separators }) => (
           <CartItem
+            id={item.id}
             name={item.name}
             price={item.price}
             quantity={item.quantity}
             total={item.total}
+            removeCartItem={removeCartItem}
           />
         )}
       />

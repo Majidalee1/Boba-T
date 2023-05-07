@@ -3,10 +3,17 @@ import { View } from "react-native";
 import { colors } from "../../../styles/colors";
 import { DeviceWidth, spacing } from "../../../utils/Layouts";
 import { ICartItem } from "../../../utils/Models";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RowContainer } from "../../../components/RowContainer";
 
-export const CartItem = ({ name, price, quantity, total }: ICartItem) => {
+export const CartItem = ({
+  id,
+  name,
+  price,
+  quantity,
+  total,
+  removeCartItem,
+}: ICartItem & { removeCartItem: (id: string) => void }) => {
   const [itemCount, setItemCount] = useState<number>(quantity || 0);
 
   return (
@@ -74,7 +81,7 @@ export const CartItem = ({ name, price, quantity, total }: ICartItem) => {
             type="font-awesome"
             color="#f44336"
             size={spacing.medium}
-            onPress={() => console.log(`delete item with id`)}
+            onPress={() => removeCartItem(id!)}
           />
         </RowContainer>
         <RowContainer

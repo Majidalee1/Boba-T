@@ -56,7 +56,7 @@ export interface ICartItem {
   product_id?: string;
   price: string;
   quantity?: number;
-  total: string;
+  total?: string;
 }
 
 export const GenerateCartItems = ({
