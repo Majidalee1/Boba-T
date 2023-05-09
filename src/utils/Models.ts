@@ -9,7 +9,7 @@ export interface IStores {
 
 // using faker to generate fake data
 
-export const AvailableStores = (count: number = 10): IStores[] => {
+export const AvailableStores = (count: number = 100): IStores[] => {
   const response = Array.from({ length: count }, (_, k) => ({
     id: faker.datatype.uuid(),
     name: faker.company.name(),

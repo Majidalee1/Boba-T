@@ -1,3 +1,4 @@
+import React from "react";
 import { Header as HeaderRNE, HeaderProps, Icon } from "@rneui/themed";
 import { colors } from "../styles/colors";
 import { NavigationProp, RouteProp } from "@react-navigation/native";

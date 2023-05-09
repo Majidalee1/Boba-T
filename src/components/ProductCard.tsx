@@ -1,3 +1,4 @@
+import React from "react";
 import { Card, Icon, Text } from "@rneui/themed";
 import { DeviceHeight, DeviceWidth, spacing } from "../utils/Layouts";
 
@@ -34,7 +35,7 @@ export const ProductCard = (props: ProductCardProps) => {
         }}
       />
       <Text
-        h6="true"
+        h6={true}
         h6Style={{
           fontWeight: "bold",
           elevation: 1,

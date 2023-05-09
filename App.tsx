@@ -1,7 +1,13 @@
+import React, { useCallback } from "react";
+import { SafeAreaView } from "react-native";
 import { createTheme, ThemeProvider } from "@rneui/themed";
-import React from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+// import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AppNavigator } from "./src/navigation/AppNavigator";
+import { useFonts } from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
+
+SplashScreen.preventAutoHideAsync();
 
 const theme = createTheme({
   lightColors: {
@@ -15,8 +21,24 @@ const theme = createTheme({
 });
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    "Poppins-Regular": require("./src/assets/fonts/Poppins-Regular.ttf"),
+    "Poppins-Medium": require("./src/assets/fonts/Poppins-Medium.ttf"),
+    "Poppins-SemiBold": require("./src/assets/fonts/Poppins-SemiBold.ttf"),
+    "Poppins-Bold": require("./src/assets/fonts/Poppins-Bold.ttf"),
+  });
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
   return (
-    <SafeAreaProvider>
+    <SafeAreaProvider onLayout={onLayoutRootView}>
       <ThemeProvider theme={theme}>
         <AppNavigator />
       </ThemeProvider>

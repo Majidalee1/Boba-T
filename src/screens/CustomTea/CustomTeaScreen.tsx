@@ -10,6 +10,7 @@ import { ScrollView, View } from "react-native";
 import { NavigationProp, RouteProp } from "@react-navigation/native";
 import { DeviceHeight, DeviceWidth, spacing } from "../../utils/Layouts";
 import { colors } from "../../styles/colors";
+import { fonts } from "../../styles/fonts";
 import { RowContainer } from "../../components/RowContainer";
 import { Button } from "@rneui/base";
 export interface Props {

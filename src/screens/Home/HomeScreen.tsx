@@ -1,3 +1,4 @@
+import React from "react";
 import { NavigationProp, RouteProp } from "@react-navigation/native";
 import { Text } from "@rneui/themed";
 import { FlatList, TouchableOpacity, View, ViewStyle } from "react-native";

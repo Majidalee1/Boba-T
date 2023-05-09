@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { RouteProp } from "@react-navigation/native";
 import {
   FlatList,
@@ -6,23 +7,23 @@ import {
   TouchableOpacity,
   View,
   ViewStyle,
+  StyleSheet,
+  StatusBar,
+  Text,
 } from "react-native";
-
+import { WithLocalSvg } from "react-native-svg";
 import { NavigationProp } from "@react-navigation/native";
-import { Text } from "@rneui/themed";
-import { Header } from "../../components/Header";
 import { AppStackParamList } from "../../navigation/AppNavigator";
-import { DeviceHeight } from "../../utils/Layouts";
+import { DeviceHeight, spacing } from "../../utils/Layouts";
 import { AvailableStores } from "../../utils/Models";
 import { StoreCard } from "./components/StoreItem";
+import { Button } from "../../components/Button";
 import { colors } from "../../styles/colors";
-import { useState } from "react";
+import { fonts } from "../../styles/fonts";
 
 const $container: ViewStyle = {
   flex: 1,
-  alignItems: "center",
-  justifyContent: "flex-start",
-  backgroundColor: "#fff",
+  backgroundColor: colors.lightGray,
   paddingTop: 20,
 };
 const $flatListContentContainer: ViewStyle = {
@@ -45,6 +46,9 @@ export const Stores = (props: Props) => {
 
   return (
     <View style={$container}>
+      <TouchableOpacity style={styles.menuBtn}>
+        <WithLocalSvg asset={require("./../../assets/icons/menu.svg")} />
+      </TouchableOpacity>
       <View
         style={{
           alignItems: "flex-start",
@@ -57,26 +61,8 @@ export const Stores = (props: Props) => {
           height: DeviceHeight * 0.2,
         }}
       >
-        <Text
-          h4={true}
-          h4Style={{
-            fontWeight: "bold",
-            elevation: 1,
-
-            color: colors.text_primary,
-          }}
-        >
-          Hello John!
-        </Text>
-        <Text
-          h4={true}
-          h4Style={{
-            fontWeight: "bold",
-            elevation: 1,
-            marginTop: 10,
-            color: colors.primary,
-          }}
-        >
+        <Text style={styles.greetingMessage}>Hello John!</Text>
+        <Text style={styles.heading}>
           Choose A shop To Order your Bubble Tea
         </Text>
       </View>
@@ -86,12 +72,10 @@ export const Stores = (props: Props) => {
         scrollEnabled={true}
         renderItem={({ item, index, separators }) => (
           <TouchableOpacity
+            activeOpacity={0.7}
             key={item.id}
             onPress={() => {
               setSelectedIndex(index);
-              navigation.navigate("Home", {
-                storeId: item.id,
-              });
             }}
           >
             <StoreCard
@@ -114,8 +98,38 @@ export const Stores = (props: Props) => {
         contentContainerStyle={{
           backgroundColor: colors.secondary,
           borderRadius: 10,
+          paddingBottom: 10,
         }}
-      ></FlatList>
+      />
+      <Button title={"Continue"} onPress={() => navigation.navigate("Tabs")} />
+      <StatusBar
+        translucent={false}
+        barStyle="dark-content"
+        backgroundColor={colors.lightGray}
+      />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  menuBtn: {
+    marginLeft: spacing.medium,
+    backgroundColor: colors.white,
+    height: 32,
+    width: 32,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 8,
+    elevation: 5,
+  },
+  greetingMessage: {
+    color: "#1C1E23",
+    fontFamily: fonts.regular,
+    fontSize: 16,
+  },
+  heading: {
+    color: colors.primary,
+    fontFamily: fonts.semiBold,
+    fontSize: 24,
+  },
+});

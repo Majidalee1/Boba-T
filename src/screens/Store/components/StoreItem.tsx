@@ -1,6 +1,9 @@
-import { Card, Icon, Image, ListItem, Text } from "@rneui/themed";
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { WithLocalSvg } from "react-native-svg";
 import { DeviceHeight, DeviceWidth } from "../../../utils/Layouts";
-import { View } from "react-native";
+import { fonts } from "../../../styles/fonts";
+import { colors } from "../../../styles/colors";
 
 export type ProductCardProps = {
   title: string;
@@ -15,47 +18,47 @@ export const StoreCard = (props: ProductCardProps) => {
     <View
       style={{
         width: DeviceWidth * 0.45,
-        height: DeviceWidth * 0.45,
+        // height: DeviceWidth * 0.45,
+        // height: 180,
         padding: 20,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-start",
-        justifyContent: "space-between",
-        marginVertical: 10,
-        marginHorizontal: 10,
+        // marginVertical: 10,
+        // marginHorizontal: 10,
+        marginLeft: 15,
         borderRadius: 10,
-        shadowColor: "#000",
+        shadowColor: "gray",
         shadowOffset: {
           width: 0,
           height: 2,
         },
-        elevation: 1,
+        elevation: 5,
         backgroundColor: isSelected ? "#4FB8E9" : "#fff",
+        marginTop: 20,
       }}
     >
-      <Icon
-        name="heartbeat"
-        type="font-awesome"
-        size={34}
-        color={isSelected ? "#fff" : "#4FB8E9"}
-        onPress={() => console.log("hello")}
-      />
+      {isSelected ? (
+        <WithLocalSvg
+          asset={require("./../../../assets/icons/storeWhite.svg")}
+        />
+      ) : (
+        <WithLocalSvg asset={require("./../../../assets/icons/store.svg")} />
+      )}
+
       <Text
-        h4={true}
-        h4Style={{
-          fontWeight: "bold",
+        style={{
           color: isSelected ? "#fff" : "#323232",
           fontSize: 16,
+          fontFamily: fonts.semiBold,
+          marginTop: 20,
         }}
       >
         {title}
       </Text>
       <Text
-        h4={true}
-        h4Style={{
-          fontWeight: "bold",
-          color: isSelected ? "#fff" : "#646464",
+        style={{
+          color: isSelected ? "#FFEEE5" : "#646464",
           fontSize: 14,
+          fontFamily: fonts.regular,
+          marginTop: 10,
         }}
       >
         {address}
@@ -63,3 +66,4 @@ export const StoreCard = (props: ProductCardProps) => {
     </View>
   );
 };
+const styles = StyleSheet.create({});

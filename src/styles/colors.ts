@@ -4,4 +4,7 @@ export const colors = {
   text_primary: "#323232",
   text_secondary: "#646464",
   background: "#FFFFFF",
+  white:"#fff",
+  black:"#000",
+  lightGray:"#FBFCFF"
 };

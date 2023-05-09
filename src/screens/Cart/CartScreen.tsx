@@ -1,3 +1,4 @@
+import React from "react";
 import {
   FlatList,
   Pressable,
@@ -9,7 +10,7 @@ import { AppStackParamList } from "../../navigation/AppNavigator";
 import { NavigationProp, RouteProp } from "@react-navigation/native";
 import {
   Avatar,
-  Button,
+  // Button,
   Dialog,
   Icon,
   Input,
@@ -19,6 +20,7 @@ import {
 } from "@rneui/themed";
 import { colors } from "./../../styles/colors";
 import { DeviceHeight, DeviceWidth, spacing } from "../../utils/Layouts";
+import { Button } from "../../components/Button";
 
 import { GenerateCartItems, ICartItem } from "../../utils/Models";
 import { CartItem } from "./components/CartItem";
@@ -55,12 +57,12 @@ export const CartScreen = ({ navigation, route }: Props) => {
   return (
     <View
       style={{
-        backgroundColor: "white",
+        backgroundColor: "#FBFCFF",
         flex: 1,
-        alignItems: "flex-start",
-        justifyContent: "flex-start",
-        paddingHorizontal: 20,
-        paddingVertical: 20,
+        // alignItems: "flex-start",
+        // justifyContent: "flex-start",
+        // paddingHorizontal: 20,
+        // paddingVertical: 20,
       }}
     >
       <Text
@@ -93,29 +95,18 @@ export const CartScreen = ({ navigation, route }: Props) => {
           />
         )}
       />
+
       {/* checkout button */}
       <Button
-        title="Checkout"
-        buttonStyle={{
-          backgroundColor: colors.primary,
-          borderRadius: 16,
-          height: 60,
-        }}
-        onPress={() => setIsDialogVisible(!isDialogVisible)}
-        containerStyle={{
-          width: DeviceWidth * 0.8,
-          height: DeviceHeight * 0.1,
-          alignSelf: "center",
-          marginHorizontal: 50,
-          marginVertical: 20,
-        }}
+        title={"Proceed to Checkout $17.54"}
+        onPress={() => navigation.navigate("Tabs")}
       />
 
-      <CheckoutDialog
+      {/* <CheckoutDialog
         isDialogVisible={isDialogVisible}
         setIsDialogVisible={setIsDialogVisible}
         value={route.params.storeId}
-      ></CheckoutDialog>
+      ></CheckoutDialog> */}
     </View>
   );
 };
