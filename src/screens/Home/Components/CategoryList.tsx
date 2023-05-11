@@ -1,40 +1,39 @@
-import { Pressable, ScrollView } from "react-native";
+import React from "react";
+import { Pressable, ScrollView, Text } from "react-native";
 import { colors } from "../../../styles/colors";
-import { spacing } from "../../../utils/Layouts";
-import { Text } from "@rneui/themed";
-export const CategoryList = (props: { categories: string[] }) => (
+import { fonts } from "../../../styles/fonts";
+
+export const CategoryList = (props: {
+  categories: string[];
+  selectedCategory: string;
+  onSelecCategory: (name: string) => void;
+}) => (
   <ScrollView
     horizontal={true}
     showsHorizontalScrollIndicator={false}
-    contentContainerStyle={{}}
+    contentContainerStyle={{ paddingVertical: 10 }}
   >
     {props.categories.map((item, index) => (
       <Pressable
         key={index}
-        onPress={() => console.log(`Pressed ${item}`)}
+        onPress={() => props.onSelecCategory(item)}
         style={{
-          paddingHorizontal: 15,
-          paddingVertical: 8,
-          marginHorizontal: 3,
-          backgroundColor: colors.primary,
+          backgroundColor:
+            props.selectedCategory === item ? colors.primary : colors.white,
           borderRadius: 10,
-          shadowColor: "#000",
-          shadowOffset: {
-            width: 5,
-            height: 6,
-          },
-          shadowRadius: 8,
-          shadowOpacity: 1,
+          height: 46,
+          justifyContent: "center",
+          paddingHorizontal: 20,
+          marginRight: 20,
+          elevation: 2,
         }}
       >
         <Text
-          h4={true}
-          h4Style={{
-            fontWeight: "bold",
-            elevation: 1,
-            fontSize: spacing.small,
-
-            color: colors.secondary,
+          style={{
+            fontSize: 14,
+            color:
+              props.selectedCategory === item ? colors.secondary : "#1C1E23",
+            fontFamily: fonts.regular,
           }}
         >
           {item}
@@ -43,3 +42,6 @@ export const CategoryList = (props: { categories: string[] }) => (
     ))}
   </ScrollView>
 );
+function onSelecCategory(item: string): void {
+  throw new Error("Function not implemented.");
+}

@@ -5,8 +5,10 @@ import {
   ScrollView,
   TouchableOpacity,
   View,
+  Text,
+  StatusBar
 } from "react-native";
-import { AppStackParamList } from "../../navigation/AppNavigator";
+import { TabParamList } from "../../navigation/AppNavigator";
 import { NavigationProp, RouteProp } from "@react-navigation/native";
 import {
   Avatar,
@@ -16,11 +18,11 @@ import {
   Input,
   ListItem,
   Switch,
-  Text,
 } from "@rneui/themed";
 import { colors } from "./../../styles/colors";
 import { DeviceHeight, DeviceWidth, spacing } from "../../utils/Layouts";
 import { Button } from "../../components/Button";
+import { fonts } from "../../styles/fonts";
 
 import { GenerateCartItems, ICartItem } from "../../utils/Models";
 import { CartItem } from "./components/CartItem";
@@ -31,8 +33,8 @@ import { RowContainer } from "../../components/RowContainer";
 import AsyncStorageService from "../../services/Storage";
 
 export interface Props {
-  navigation: NavigationProp<AppStackParamList>;
-  route: RouteProp<AppStackParamList, "Cart">;
+  navigation: NavigationProp<TabParamList>;
+  route: RouteProp<TabParamList, "Cart">;
 }
 export const CartScreen = ({ navigation, route }: Props) => {
   const [isDialogVisible, setIsDialogVisible] = useState<boolean>(false);
@@ -59,25 +61,12 @@ export const CartScreen = ({ navigation, route }: Props) => {
       style={{
         backgroundColor: "#FBFCFF",
         flex: 1,
-        // alignItems: "flex-start",
-        // justifyContent: "flex-start",
-        // paddingHorizontal: 20,
-        // paddingVertical: 20,
       }}
     >
       <Text
-        h4={true}
-        h4Style={{
-          fontWeight: "500",
-          elevation: 1,
-          marginVertical: 20,
-          paddingHorizontal: 10,
-          color: colors.text_primary,
-          fontSize: spacing.title,
-          alignSelf: "center",
-        }}
+        style={{ color: "#323232", textAlign: "center", fontSize: 18, fontFamily: fonts.medium, marginTop: 20 }}
       >
-        {CartItems.length}
+        Cart Items ({CartItems.length})
       </Text>
       <FlatList
         style={{ maxHeight: DeviceHeight * 0.8 }}
@@ -97,10 +86,13 @@ export const CartScreen = ({ navigation, route }: Props) => {
       />
 
       {/* checkout button */}
-      <Button
-        title={"Proceed to Checkout $17.54"}
-        onPress={() => navigation.navigate("Tabs")}
-      />
+      <View style={{ marginBottom: 20 }}>
+        <Button
+          title={"Proceed to Checkout $17.54"}
+          onPress={() => navigation.navigate("Tabs")}
+        />
+      </View>
+      <StatusBar translucent={false} backgroundColor="#FBFCFF" />
 
       {/* <CheckoutDialog
         isDialogVisible={isDialogVisible}
@@ -113,117 +105,117 @@ export const CartScreen = ({ navigation, route }: Props) => {
 
 // checkout Dialog
 
-export const CheckoutDialog = ({
-  isDialogVisible,
-  setIsDialogVisible,
-  value,
-}: {
-  isDialogVisible: boolean;
-  setIsDialogVisible: React.Dispatch<React.SetStateAction<boolean>>;
-  value: string;
-}) => (
-  <Dialog
-    hardwareAccelerated={true}
-    isVisible={isDialogVisible}
-    overlayStyle={{
-      borderRadius: 12,
-      width: DeviceWidth * 0.8,
-    }}
-    style={{
-      backgroundColor: colors.background,
-      borderRadius: 20,
-      alignItems: "center",
-      justifyContent: "center",
-    }}
-    onBackdropPress={() => setIsDialogVisible(!isDialogVisible)}
-  >
-    <View
-      style={{
-        flexDirection: "column",
-        borderRadius: 10,
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <Text
-        h4={true}
-        h4Style={{
-          fontWeight: "900",
-          elevation: 1,
-          fontSize: 18,
-          color: colors.text_primary,
-          alignSelf: "center",
-          paddingHorizontal: 10,
-          paddingVertical: 2,
-        }}
-      >
-        Show This To Your Cashier
-      </Text>
-      {/* ORder Number Tex */}
-      <Text
-        h4={true}
-        h4Style={{
-          fontWeight: "300",
-          elevation: 1,
-          fontSize: 14,
-          color: colors.text_secondary,
-          paddingBottom: 10,
-        }}
-      >
-        {`Order Number: #${faker.random.alphaNumeric(10)}`}
-      </Text>
-      <QRCode
-        value={value}
-        color={colors.primary}
-        backgroundColor={colors.secondary}
-        size={DeviceWidth * 0.6}
-      ></QRCode>
-    </View>
-    {/* Read only input Feild */}
-    <TouchableOpacity
-      style={{
-        borderRadius: 16,
-        height: 60,
-        width: DeviceWidth * 0.5,
-        alignSelf: "center",
-        alignItems: "center",
-        justifyContent: "center",
-        marginVertical: 20,
-      }}
-      onPress={() => setIsDialogVisible(!isDialogVisible)}
-    >
-      <RowContainer
-        styles={{
-          borderRadius: 12,
-          height: 40,
-          width: DeviceWidth * 0.4,
-          alignSelf: "center",
-          elevation: 1,
-          borderColor: colors.primary,
-          borderWidth: 1,
-          alignContent: "center",
-          paddingHorizontal: 10,
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Text
-          h4={true}
-          h4Style={{
-            fontWeight: "300",
-            elevation: 1,
-            fontSize: spacing.small,
-          }}
-        >
-          Click To Copy
-        </Text>
-        <Icon
-          name="content-copy"
-          type="material-community"
-          color={colors.primary}
-          size={spacing.large}
-        />
-      </RowContainer>
-    </TouchableOpacity>
-  </Dialog>
-);
+// export const CheckoutDialog = ({
+//   isDialogVisible,
+//   setIsDialogVisible,
+//   value,
+// }: {
+//   isDialogVisible: boolean;
+//   setIsDialogVisible: React.Dispatch<React.SetStateAction<boolean>>;
+//   value: string;
+// }) => (
+//   <Dialog
+//     hardwareAccelerated={true}
+//     isVisible={isDialogVisible}
+//     overlayStyle={{
+//       borderRadius: 12,
+//       width: DeviceWidth * 0.8,
+//     }}
+//     style={{
+//       backgroundColor: colors.background,
+//       borderRadius: 20,
+//       alignItems: "center",
+//       justifyContent: "center",
+//     }}
+//     onBackdropPress={() => setIsDialogVisible(!isDialogVisible)}
+//   >
+//     <View
+//       style={{
+//         flexDirection: "column",
+//         borderRadius: 10,
+//         alignItems: "center",
+//         justifyContent: "center",
+//       }}
+//     >
+//       <Text
+//         h4={true}
+//         h4Style={{
+//           fontWeight: "900",
+//           elevation: 1,
+//           fontSize: 18,
+//           color: colors.text_primary,
+//           alignSelf: "center",
+//           paddingHorizontal: 10,
+//           paddingVertical: 2,
+//         }}
+//       >
+//         Show This To Your Cashier
+//       </Text>
+//       {/* ORder Number Tex */}
+//       <Text
+//         h4={true}
+//         h4Style={{
+//           fontWeight: "300",
+//           elevation: 1,
+//           fontSize: 14,
+//           color: colors.text_secondary,
+//           paddingBottom: 10,
+//         }}
+//       >
+//         {`Order Number: #${faker.random.alphaNumeric(10)}`}
+//       </Text>
+//       <QRCode
+//         value={value}
+//         color={colors.primary}
+//         backgroundColor={colors.secondary}
+//         size={DeviceWidth * 0.6}
+//       ></QRCode>
+//     </View>
+//     {/* Read only input Feild */}
+//     <TouchableOpacity
+//       style={{
+//         borderRadius: 16,
+//         height: 60,
+//         width: DeviceWidth * 0.5,
+//         alignSelf: "center",
+//         alignItems: "center",
+//         justifyContent: "center",
+//         marginVertical: 20,
+//       }}
+//       onPress={() => setIsDialogVisible(!isDialogVisible)}
+//     >
+//       <RowContainer
+//         styles={{
+//           borderRadius: 12,
+//           height: 40,
+//           width: DeviceWidth * 0.4,
+//           alignSelf: "center",
+//           elevation: 1,
+//           borderColor: colors.primary,
+//           borderWidth: 1,
+//           alignContent: "center",
+//           paddingHorizontal: 10,
+//           justifyContent: "space-between",
+//           alignItems: "center",
+//         }}
+//       >
+//         <Text
+//           h4={true}
+//           h4Style={{
+//             fontWeight: "300",
+//             elevation: 1,
+//             fontSize: spacing.small,
+//           }}
+//         >
+//           Click To Copy
+//         </Text>
+//         <Icon
+//           name="content-copy"
+//           type="material-community"
+//           color={colors.primary}
+//           size={spacing.large}
+//         />
+//       </RowContainer>
+//     </TouchableOpacity>
+//   </Dialog>
+// );

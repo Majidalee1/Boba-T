@@ -1,21 +1,23 @@
-import { Icon, Text, Image } from "@rneui/base";
 import React from "react";
-import { Pressable, View } from "react-native";
+import { Image, Text, Pressable, View, TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { WithLocalSvg } from "react-native-svg";
+import { Icon } from "@rneui/base";
 import { colors } from "../../../styles/colors";
 import { DeviceWidth, spacing } from "../../../utils/Layouts";
-
 import { ICartItem, IProduct } from "../../../utils/Models";
 import { AppStackParamList } from "../../../navigation/AppNavigator";
 import { NavigationProp, RouteProp } from "@react-navigation/native";
 import { RowContainer } from "../../../components/RowContainer";
 import AsyncStorageService from "../../../services/Storage";
+import { fonts } from "../../../styles/fonts";
 
 interface Props {
   item: IProduct;
-  navigation: NavigationProp<AppStackParamList>;
 }
 
-export const ProductCard = ({ item, navigation }: Props) => {
+export const ProductCard = ({ item }: Props) => {
+  const navigation = useNavigation();
   const handleAddToCart = async (product: IProduct) => {
     const cartItems: ICartItem[] | null = await AsyncStorageService.getItem(
       "cart"
@@ -32,74 +34,66 @@ export const ProductCard = ({ item, navigation }: Props) => {
   };
 
   return (
-    <Pressable key={item.id} onPress={() => console.log("tea selection store")}>
+    <Pressable key={item.id} onPress={() => navigation.navigate("Details")}>
       <View
         style={{
           alignItems: "flex-start",
           display: "flex",
           elevation: 1,
-          height: DeviceWidth * 0.5,
           flexDirection: "column",
           width: DeviceWidth * 0.41,
           marginHorizontal: 4,
-          marginVertical: 5,
           borderRadius: 10,
           backgroundColor: colors.secondary,
+          marginTop: 20,
+          height: 208,
         }}
       >
         <Image
           source={{
-            uri: "https://source.unsplash.com/random/?bubble,tea",
+            uri: "https://images.pexels.com/photos/90946/pexels-photo-90946.jpeg?cs=srgb&dl=pexels-math-90946.jpg&fm=jpg",
           }}
           style={{
-            width: DeviceWidth * 0.41,
-            height: DeviceWidth * 0.3,
             borderTopLeftRadius: 10,
             borderTopRightRadius: 10,
+            height: 106,
+            width: "100%",
           }}
         />
-        <Text
-          h4={true}
-          textBreakStrategy="highQuality"
-          h4Style={{
-            fontWeight: "bold",
-            fontSize: spacing.medium,
-            paddingEnd: 10,
-            height: DeviceWidth * 0.12,
-            paddingVertical: 5,
-            paddingHorizontal: 10,
-            color: colors.text_primary,
-            alignSelf: "flex-start",
-          }}
-        >
-          {item.name}
-        </Text>
-        <RowContainer
-          styles={{
-            paddingHorizontal: 10,
-            paddingVertical: 5,
-            justifyContent: "space-between",
-            backgroundColor: colors.secondary,
-            width: DeviceWidth * 0.41,
-          }}
-        >
+        <View style={{ padding: 10, width: "100%" }}>
           <Text
-            h4={true}
-            h4Style={{
-              fontWeight: "bold",
-              fontSize: spacing.small,
+            style={{
+              fontSize: 14,
+              color: colors.black,
+              fontFamily: fonts.medium,
             }}
           >
-            $ 5.00
+            {item.name}
           </Text>
-          <Icon
-            name="cart-plus"
-            type="font-awesome"
-            onPress={() => handleAddToCart(item)}
-            color={colors.primary}
-            size={spacing.medium}
-          />
-        </RowContainer>
+          <RowContainer
+            styles={{
+              justifyContent: "space-between",
+              backgroundColor: colors.secondary,
+              marginTop: 5,
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 16,
+                fontFamily: fonts.bold,
+                color: colors.primary,
+              }}
+            >
+              $ 5.00
+            </Text>
+            <TouchableOpacity>
+              <WithLocalSvg
+                asset={require("./../../../assets/icons/cartBtn.svg")}
+              />
+            </TouchableOpacity>
+          </RowContainer>
+        </View>
       </View>
     </Pressable>
   );

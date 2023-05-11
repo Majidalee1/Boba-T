@@ -1,10 +1,12 @@
+import React from "react";
 import { Avatar, Text, Icon } from "@rneui/base";
-import { View } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { colors } from "../../../styles/colors";
 import { DeviceWidth, spacing } from "../../../utils/Layouts";
 import { ICartItem } from "../../../utils/Models";
 import { useEffect, useState } from "react";
 import { RowContainer } from "../../../components/RowContainer";
+import { WithLocalSvg } from "react-native-svg";
 
 export const CartItem = ({
   id,
@@ -18,26 +20,7 @@ export const CartItem = ({
 
   return (
     <View
-      style={{
-        backgroundColor: colors.secondary,
-        width: "100%",
-        borderRadius: 20,
-        paddingHorizontal: 10,
-        justifyContent: "flex-start",
-        marginVertical: 5,
-        flexDirection: "row",
-        alignItems: "center",
-        maxWidth: DeviceWidth * 0.9,
-        height: DeviceWidth * 0.25,
-        shadowColor: "rgba(0,0,0,0.05)",
-        elevation: 2,
-        shadowOffset: {
-          width: 0,
-          height: 4,
-        },
-        shadowOpacity: 0.7,
-        shadowRadius: 54,
-      }}
+      style={styles.card}
     >
       <Avatar
         rounded={true}
@@ -76,13 +59,16 @@ export const CartItem = ({
           >
             {name}
           </Text>
-          <Icon
-            name="trash"
-            type="font-awesome"
-            color="#f44336"
-            size={spacing.medium}
-            onPress={() => removeCartItem(id!)}
-          />
+          <TouchableOpacity>
+            <WithLocalSvg asset={require('./../../../assets/icons/Delete.svg')} />
+            {/* <Icon
+              name="trash"
+              type="font-awesome"
+              color="#f44336"
+              size={spacing.medium}
+              onPress={() => removeCartItem(id!)}
+            /> */}
+          </TouchableOpacity>
         </RowContainer>
         <RowContainer
           styles={{
@@ -130,3 +116,26 @@ export const CartItem = ({
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: colors.white,
+    width: "100%",
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    justifyContent: "flex-start",
+    marginVertical: 5,
+    flexDirection: "row",
+    alignItems: "center",
+    maxWidth: DeviceWidth * 0.9,
+    height: DeviceWidth * 0.25,
+    elevation: 5,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.7,
+    shadowRadius: 54,
+    alignSelf: "center"
+  }
+})

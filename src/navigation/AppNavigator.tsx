@@ -15,23 +15,27 @@ import { WithLocalSvg } from "react-native-svg";
 
 export type AppStackParamList = {
   Store: undefined;
-  Home: {
-    storeId: string;
-  };
   Details: {
     productId: string;
   };
   CheckOut: undefined;
-  Cart: {
-    storeId: string;
-    cartId?: string;
-  };
   CustomTea: undefined;
   Welcome: undefined;
   Tabs: undefined;
 };
 
+export type TabParamList = {
+  Home: {
+    storeId: string;
+  };
+  Cart: {
+    cartId: string,
+    storeId: string,
+  }
+};
+
 const NavigationStack = createNativeStackNavigator<AppStackParamList>();
+const Tab = createBottomTabNavigator<TabParamList>();
 
 // navigation screen props
 
@@ -47,49 +51,59 @@ export type NavigationScreenProps<T extends keyof AppStackParamList> = {
     params: AppStackParamList[T];
   };
 };
+export type TabScreenProps<T extends keyof TabParamList> = {
+  navigation: {
+    navigate: (
+      screen: keyof TabParamList,
+      params?: TabParamList[keyof TabParamList]
+    ) => void;
+    goBack: () => void;
+  };
+  route: {
+    params: TabParamList[T];
+  };
+};
+
 
 export type TabsScreenNavigationProps = NavigationScreenProps<"Tabs">;
 export type WelcomeScreenNavigationProps = NavigationScreenProps<"Welcome">;
-export type HomeScreenNavigationProps = NavigationScreenProps<"Home">;
+export type HomeScreenNavigationProps = TabScreenProps<"Home">;
 export type ProductDetailsNavigationProps = NavigationScreenProps<"Details">;
 export type StoreScrenNavigationProps = NavigationScreenProps<"Store">;
-export type CartScreenNavigationProps = NavigationScreenProps<"Cart">;
+export type CartScreenNavigationProps = TabScreenProps<"Cart">;
 
-const Tab = createBottomTabNavigator();
+
 
 function BottomTabNavigator() {
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
+    screenOptions={({ route }) => ({
+      tabBarIcon: ({ focused }) => {
+        let iconName;
 
-          if (route.name === "Home") {
-            iconName = focused ? (
-              <WithLocalSvg
-                asset={require("./../assets/icons/homeActive.svg")}
-              />
-            ) : (
-              <WithLocalSvg asset={require("./../assets/icons/Home.svg")} />
-            );
-          } else if (route.name === "Cart") {
-            iconName = focused ? (
-              <WithLocalSvg
-                asset={require("./../assets/icons/activeCart.svg")}
-              />
-            ) : (
-              <WithLocalSvg asset={require("./../assets/icons/cart.svg")} />
-            );
-          }
+        if (route.name === "Home") {
+          iconName = focused ? (
+            <WithLocalSvg
+              asset={require("./../assets/icons/homeActive.svg")}
+            />
+          ) : (
+            <WithLocalSvg asset={require("./../assets/icons/Home.svg")} />
+          );
+        } else if (route.name === "Cart") {
+          iconName = focused ? (
+            <WithLocalSvg
+              asset={require("./../assets/icons/activeCart.svg")}
+            />
+          ) : (
+            <WithLocalSvg asset={require("./../assets/icons/cart.svg")} />
+          );
+        }
 
-          // You can return any component that you like here!
-          return iconName;
-        },
-        // tabBarActiveTintColor: "tomato",
-        // tabBarInactiveTintColor: "gray",
-      })}
+        return iconName;
+      },
+    })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
       <Tab.Screen
         name="Cart"
         component={CartScreen}
@@ -97,6 +111,7 @@ function BottomTabNavigator() {
           cartId: "1",
           storeId: "1",
         }}
+        options={{ headerShown: false }}
       />
     </Tab.Navigator>
   );
@@ -131,9 +146,7 @@ export const Stack = () => {
       <NavigationStack.Screen
         name="Tabs"
         component={BottomTabNavigator}
-        // initialParams={{
-        //   storeId: "1",
-        // }}
+        options={{ headerShown: false }}
       />
       <NavigationStack.Screen
         name="Details"

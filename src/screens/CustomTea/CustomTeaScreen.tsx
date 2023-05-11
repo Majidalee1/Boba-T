@@ -2,10 +2,19 @@ import {
   AppStackParamList,
   NavigationScreenProps,
 } from "../../navigation/AppNavigator";
-import { ButtonGroup, Text } from "@rneui/themed";
+import { Entypo } from "@expo/vector-icons";
+import { ButtonGroup } from "@rneui/themed";
 
 import React, { useState } from "react";
-import { ScrollView, View } from "react-native";
+import {
+  ScrollView,
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  StatusBar,
+  Image,
+} from "react-native";
 
 import { NavigationProp, RouteProp } from "@react-navigation/native";
 import { DeviceHeight, DeviceWidth, spacing } from "../../utils/Layouts";
@@ -95,29 +104,20 @@ export const CustomTeaScreen = () => {
       style={{
         flex: 1,
         backgroundColor: colors.primary,
-        justifyContent: "flex-start",
-        paddingTop: DeviceHeight * 0.05,
       }}
     >
       {/* header component */}
-      <View
-        style={{
-          height: DeviceHeight * 0.2,
-          width: DeviceWidth,
-        }}
-      >
-        <Text
-          h4={true}
-          h4Style={{
-            color: colors.secondary,
-            textAlign: "center",
-            fontSize: spacing.medium,
-            marginTop: DeviceHeight * 0.07,
-          }}
-        >
-          Customize Your Bubble Tea
-        </Text>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backBtn}>
+          <Entypo name="chevron-small-left" size={24} color="black" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}> Customizable Tea</Text>
       </View>
+      <Image
+        source={require("./../../assets/images/bubble-milk.png")}
+        style={styles.productImage}
+      />
+
       <ScrollView
         style={{
           flex: 1,
@@ -125,7 +125,9 @@ export const CustomTeaScreen = () => {
           height: DeviceHeight,
           backgroundColor: colors.secondary,
           borderRadius: 30,
+          marginTop: 30,
         }}
+        showsVerticalScrollIndicator={false}
       >
         <View
           style={{
@@ -188,8 +190,7 @@ export const CustomTeaScreen = () => {
       >
         <View style={{}}>
           <Text
-            h4={true}
-            h4Style={{
+            style={{
               color: colors.text_secondary,
               fontSize: spacing.medium - 2,
               paddingVertical: 3,
@@ -198,8 +199,7 @@ export const CustomTeaScreen = () => {
             Total
           </Text>
           <Text
-            h4={true}
-            h4Style={{
+            style={{
               color: colors.primary,
               fontSize: spacing.medium,
               paddingVertical: 3,
@@ -224,6 +224,7 @@ export const CustomTeaScreen = () => {
           }}
         />
       </View>
+      <StatusBar backgroundColor={colors.primary} barStyle="light-content" />
     </View>
   );
 };
@@ -237,12 +238,12 @@ export const SelectionButtonGroup = (props: {
   return (
     <View style={{ paddingHorizontal: 10, paddingVertical: 5 }}>
       <Text
-        h4={true}
-        h4Style={{
+        style={{
           color: colors.text_primary,
-          fontSize: spacing.medium,
+          fontSize: 16,
           paddingHorizontal: 10,
           paddingVertical: 5,
+          fontFamily: fonts.medium,
         }}
       >
         {props.title}
@@ -260,20 +261,36 @@ export const SelectionButtonGroup = (props: {
             borderColor: colors.primary,
             borderWidth: 1,
             elevation: 1,
+            height: 50,
+            marginRight: 10,
+            borderRadius: 10,
+          }}
+          buttonStyle={{
+            height: 50,
+            marginRight: 10,
+            borderRadius: 10,
+            borderWidth: 1,
+            borderColor: "#D2D2D2",
           }}
           textStyle={{
             color: colors.text_primary,
-            fontSize: spacing.small,
+            fontSize: 14,
             paddingVertical: spacing.small,
             paddingHorizontal: spacing.medium,
+            fontFamily: fonts.medium,
           }}
           selectedTextStyle={{
             color: colors.primary,
+            fontFamily: fonts.medium,
+            fontSize: 14,
           }}
           buttons={props.buttons}
           containerStyle={{
             marginBottom: spacing.small,
             marginHorizontal: 10,
+            height: 50,
+            backgroundColor: "transparent",
+            borderWidth: 0,
           }}
         />
       </ScrollView>
@@ -281,3 +298,37 @@ export const SelectionButtonGroup = (props: {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  backBtn: {
+    backgroundColor: colors.white,
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 10,
+    borderRadius: 10,
+  },
+  header: {
+    marginTop: 20,
+    width: "90%",
+    alignSelf: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 15,
+    // elevation: 10,
+  },
+  headerTitle: {
+    flex: 1,
+    textAlign: "center",
+    color: "#FBFCFF",
+    fontFamily: fonts.medium,
+    fontSize: 18,
+    marginRight: 20,
+  },
+  productImage: {
+    height: 226,
+    width: 190,
+    alignSelf: "center",
+  },
+});

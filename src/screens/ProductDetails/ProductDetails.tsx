@@ -46,7 +46,7 @@ export const ProductDetails = ({ navigation, route }: Props) => {
             Pastel Purple is a popular beverage that is typically made with a
             base of tea, milk, and chewy tapioca pearls. The pastel purple
             color...
-            <TouchableOpacity style={{ borderWidth: 1 }}>
+            <TouchableOpacity>
               <Text style={styles.readMoreBtn}>Read more</Text>
             </TouchableOpacity>
           </Text>
