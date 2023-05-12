@@ -24,7 +24,9 @@ interface Props {
 }
 export const Welcome = (props: Props) => {
   useEffect(() => {
-    props.navigation.navigate("Store");
+    setTimeout(() => {
+      props.navigation.navigate("Store");
+    }, 3000);
   }, []);
   return (
     <View style={$container}>

@@ -11,6 +11,7 @@ import { Stores } from "../screens/Store/SelectStoreScreen";
 import { CartScreen } from "../screens/Cart/CartScreen";
 import { CustomTeaScreen } from "../screens/CustomTea/CustomTeaScreen";
 import { Welcome } from "../screens/Welcome/Welcome";
+import { Checkout } from "../screens/Checkout/Checkout";
 import { WithLocalSvg } from "react-native-svg";
 
 export type AppStackParamList = {
@@ -18,7 +19,7 @@ export type AppStackParamList = {
   Details: {
     productId: string;
   };
-  CheckOut: undefined;
+  Checkout: undefined;
   CustomTea: undefined;
   Welcome: undefined;
   Tabs: undefined;
@@ -29,9 +30,9 @@ export type TabParamList = {
     storeId: string;
   };
   Cart: {
-    cartId: string,
-    storeId: string,
-  }
+    cartId: string;
+    storeId: string;
+  };
 };
 
 const NavigationStack = createNativeStackNavigator<AppStackParamList>();
@@ -64,46 +65,48 @@ export type TabScreenProps<T extends keyof TabParamList> = {
   };
 };
 
-
 export type TabsScreenNavigationProps = NavigationScreenProps<"Tabs">;
 export type WelcomeScreenNavigationProps = NavigationScreenProps<"Welcome">;
 export type HomeScreenNavigationProps = TabScreenProps<"Home">;
 export type ProductDetailsNavigationProps = NavigationScreenProps<"Details">;
 export type StoreScrenNavigationProps = NavigationScreenProps<"Store">;
+export type CheckoutScrenNavigationProps = NavigationScreenProps<"Checkout">;
 export type CartScreenNavigationProps = TabScreenProps<"Cart">;
-
-
 
 function BottomTabNavigator() {
   return (
     <Tab.Navigator
-    screenOptions={({ route }) => ({
-      tabBarIcon: ({ focused }) => {
-        let iconName;
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused }) => {
+          let iconName;
 
-        if (route.name === "Home") {
-          iconName = focused ? (
-            <WithLocalSvg
-              asset={require("./../assets/icons/homeActive.svg")}
-            />
-          ) : (
-            <WithLocalSvg asset={require("./../assets/icons/Home.svg")} />
-          );
-        } else if (route.name === "Cart") {
-          iconName = focused ? (
-            <WithLocalSvg
-              asset={require("./../assets/icons/activeCart.svg")}
-            />
-          ) : (
-            <WithLocalSvg asset={require("./../assets/icons/cart.svg")} />
-          );
-        }
+          if (route.name === "Home") {
+            iconName = focused ? (
+              <WithLocalSvg
+                asset={require("./../assets/icons/homeActive.svg")}
+              />
+            ) : (
+              <WithLocalSvg asset={require("./../assets/icons/Home.svg")} />
+            );
+          } else if (route.name === "Cart") {
+            iconName = focused ? (
+              <WithLocalSvg
+                asset={require("./../assets/icons/activeCart.svg")}
+              />
+            ) : (
+              <WithLocalSvg asset={require("./../assets/icons/cart.svg")} />
+            );
+          }
 
-        return iconName;
-      },
-    })}
+          return iconName;
+        },
+      })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{ headerShown: false }}
+      />
       <Tab.Screen
         name="Cart"
         component={CartScreen}
@@ -126,36 +129,18 @@ export const Stack = () => {
         gestureDirection: "horizontal",
         title: "Home",
       }}
-      initialRouteName="Welcome"
     >
-      {/* CustomTeaScreen */}
-      <NavigationStack.Screen
-        name="Welcome"
-        component={Welcome}
-        options={{ headerShown: false }}
-      />
+      <NavigationStack.Screen name="Welcome" component={Welcome} />
       <NavigationStack.Screen name="CustomTea" component={CustomTeaScreen} />
-      {/* <NavigationStack.Screen
-        name="Cart"
-        initialParams={{
-          cartId: "1",
-          storeId: "1",
-        }}
-        component={CartScreen}
-      /> */}
-      <NavigationStack.Screen
-        name="Tabs"
-        component={BottomTabNavigator}
-        options={{ headerShown: false }}
-      />
+      <NavigationStack.Screen name="Tabs" component={BottomTabNavigator} />
       <NavigationStack.Screen
         name="Details"
         component={ProductDetails}
         options={(props) => ({
           title: `Profile: `,
-          // ${props.route.params.productId}
         })}
       />
+      <NavigationStack.Screen name="Checkout" component={Checkout} />
       <NavigationStack.Screen name="Store" component={Stores} />
     </NavigationStack.Navigator>
   );

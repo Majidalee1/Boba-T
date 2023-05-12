@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
   Text,
-  StatusBar
+  StatusBar,
 } from "react-native";
 import { TabParamList } from "../../navigation/AppNavigator";
 import { NavigationProp, RouteProp } from "@react-navigation/native";
@@ -64,12 +64,18 @@ export const CartScreen = ({ navigation, route }: Props) => {
       }}
     >
       <Text
-        style={{ color: "#323232", textAlign: "center", fontSize: 18, fontFamily: fonts.medium, marginTop: 20 }}
+        style={{
+          color: "#323232",
+          textAlign: "center",
+          fontSize: 18,
+          fontFamily: fonts.medium,
+          marginTop: 20,
+        }}
       >
         Cart Items ({CartItems.length})
       </Text>
       <FlatList
-        style={{ maxHeight: DeviceHeight * 0.8 }}
+        // style={{ maxHeight: DeviceHeight * 0.8 }}
         data={CartItems}
         scrollEnabled={true}
         keyExtractor={(item) => item.id!}
@@ -83,13 +89,15 @@ export const CartScreen = ({ navigation, route }: Props) => {
             removeCartItem={removeCartItem}
           />
         )}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 20 }}
       />
 
       {/* checkout button */}
       <View style={{ marginBottom: 20 }}>
         <Button
           title={"Proceed to Checkout $17.54"}
-          onPress={() => navigation.navigate("Tabs")}
+          onPress={() => navigation.navigate("Checkout")}
         />
       </View>
       <StatusBar translucent={false} backgroundColor="#FBFCFF" />

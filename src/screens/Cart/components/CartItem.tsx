@@ -1,12 +1,14 @@
 import React from "react";
-import { Avatar, Text, Icon } from "@rneui/base";
-import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { Avatar, Icon } from "@rneui/base";
+import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
+import { Entypo, AntDesign } from "@expo/vector-icons";
 import { colors } from "../../../styles/colors";
 import { DeviceWidth, spacing } from "../../../utils/Layouts";
 import { ICartItem } from "../../../utils/Models";
 import { useEffect, useState } from "react";
 import { RowContainer } from "../../../components/RowContainer";
 import { WithLocalSvg } from "react-native-svg";
+import { fonts } from "../../../styles/fonts";
 
 export const CartItem = ({
   id,
@@ -17,11 +19,9 @@ export const CartItem = ({
   removeCartItem,
 }: ICartItem & { removeCartItem: (id: string) => void }) => {
   const [itemCount, setItemCount] = useState<number>(quantity || 0);
-
+  const [item, setItem] = useState(0);
   return (
-    <View
-      style={styles.card}
-    >
+    <View style={styles.card}>
       <Avatar
         rounded={true}
         source={{
@@ -48,26 +48,18 @@ export const CartItem = ({
           }}
         >
           <Text
-            h4={true}
-            h4Style={{
-              fontWeight: "bold",
+            style={{
               fontSize: spacing.medium,
-              paddingEnd: 10,
               color: colors.text_primary,
-              alignSelf: "flex-start",
+              fontFamily: fonts.medium,
             }}
           >
             {name}
           </Text>
           <TouchableOpacity>
-            <WithLocalSvg asset={require('./../../../assets/icons/Delete.svg')} />
-            {/* <Icon
-              name="trash"
-              type="font-awesome"
-              color="#f44336"
-              size={spacing.medium}
-              onPress={() => removeCartItem(id!)}
-            /> */}
+            <WithLocalSvg
+              asset={require("./../../../assets/icons/Delete.svg")}
+            />
           </TouchableOpacity>
         </RowContainer>
         <RowContainer
@@ -80,36 +72,38 @@ export const CartItem = ({
             paddingHorizontal: 5,
           }}
         >
-          <RowContainer>
-            <Icon
-              name="minus"
-              type="font-awesome"
-              style={{ paddingEnd: 10 }}
-              color={colors.text_primary}
-              size={spacing.medium}
-              onPress={() => setItemCount(itemCount > 0 ? itemCount - 1 : 0)}
-            />
-            <Text>{itemCount}</Text>
-            <Icon
-              name="plus"
-              type="font-awesome"
-              color={colors.text_primary}
+          <View style={styles.itemsBtns}>
+            <TouchableOpacity
+              disabled={item === 0}
+              onPress={() => setItem(item - 1)}
+            >
+              <AntDesign
+                name="minus"
+                size={15}
+                color={item === 0 ? "#969696" : colors.text_primary}
+              />
+            </TouchableOpacity>
+            <Text
               style={{
-                paddingStart: 10,
+                color: colors.text_primary,
+                fontFamily: fonts.medium,
+                fontSize: 14,
               }}
-              size={spacing.medium}
-              onPress={() => setItemCount(itemCount + 1)}
-            />
-          </RowContainer>
+            >
+              {item}
+            </Text>
+            <TouchableOpacity onPress={() => setItem(item + 1)}>
+              <AntDesign name="plus" size={15} color={colors.text_primary} />
+            </TouchableOpacity>
+          </View>
           <Text
-            h4={true}
-            h4Style={{
-              fontWeight: "700",
-              fontSize: spacing.medium,
+            style={{
+              fontSize: 18,
               color: colors.primary,
+              fontFamily: fonts.bold,
             }}
           >
-            {price}
+            ${price}
           </Text>
         </RowContainer>
       </View>
@@ -120,22 +114,30 @@ export const CartItem = ({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.white,
-    width: "100%",
+    width: "90%",
     borderRadius: 12,
-    paddingHorizontal: 10,
-    justifyContent: "flex-start",
-    marginVertical: 5,
     flexDirection: "row",
     alignItems: "center",
-    maxWidth: DeviceWidth * 0.9,
-    height: DeviceWidth * 0.25,
-    elevation: 5,
+    elevation: 2,
     shadowOffset: {
       width: 0,
       height: 4,
     },
     shadowOpacity: 0.7,
     shadowRadius: 54,
-    alignSelf: "center"
-  }
-})
+    alignSelf: "center",
+    marginTop: 20,
+    padding: 10,
+  },
+  itemsBtns: {
+    flexDirection: "row",
+    height: 33,
+    borderWidth: 1,
+    borderColor: "#D8D8D8",
+    width: 74,
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 10,
+    borderRadius: 24,
+  },
+});

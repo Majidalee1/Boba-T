@@ -2,7 +2,7 @@ import {
   AppStackParamList,
   NavigationScreenProps,
 } from "../../navigation/AppNavigator";
-import { Entypo } from "@expo/vector-icons";
+import { Entypo, AntDesign } from "@expo/vector-icons";
 import { ButtonGroup } from "@rneui/themed";
 
 import React, { useState } from "react";
@@ -27,7 +27,7 @@ export interface Props {
   route: RouteProp<AppStackParamList, "CustomTea">;
 }
 
-export const CustomTeaScreen = () => {
+export const CustomTeaScreen = ({ navigation }: Props) => {
   const [sizeIndex, setSizeIndex] = useState(0);
   const [iceIndex, setIceIndex] = useState(0);
   const [sugarIndex, setSugarIndex] = useState(0);
@@ -35,9 +35,10 @@ export const CustomTeaScreen = () => {
   const [milkIndex, setMilkIndex] = useState(0);
   const [toppingIndex, setToppingIndex] = useState(0);
   const [jellyIndex, setJellyIndex] = useState(0);
+  const [item, setItem] = useState(0);
 
   const sizes = ["Small", "Large"];
-  const ices = ["No ice", "Little", "Normal", "A lot"];
+  const ices = ["No", "Little", "Normal", "A lot"];
   const sugars = ["0%", "30%", "50%", "70%", "Regular"];
   const teas = ["Black milk tea", "Jasmine green milk tea", "Caramel milk tea"];
   const milks = [
@@ -108,7 +109,10 @@ export const CustomTeaScreen = () => {
     >
       {/* header component */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn}>
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => navigation.goBack()}
+        >
           <Entypo name="chevron-small-left" size={24} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}> Customizable Tea</Text>
@@ -118,25 +122,19 @@ export const CustomTeaScreen = () => {
         style={styles.productImage}
       />
 
-      <ScrollView
+      <View
         style={{
-          flex: 1,
-          width: DeviceWidth,
-          height: DeviceHeight,
           backgroundColor: colors.secondary,
-          borderRadius: 30,
-          marginTop: 30,
+          // height: DeviceHeight,
+          // paddingBottom: DeviceHeight * 0.1,
+          borderTopEndRadius: 30,
+          borderTopStartRadius: 30,
+          flex: 1,
         }}
-        showsVerticalScrollIndicator={false}
       >
-        <View
-          style={{
-            backgroundColor: colors.secondary,
-            height: DeviceHeight,
-            paddingBottom: DeviceHeight * 0.1,
-            borderTopEndRadius: 30,
-            borderTopStartRadius: 30,
-          }}
+        <ScrollView
+          contentContainerStyle={{ paddingBottom: 150 }}
+          showsVerticalScrollIndicator={false}
         >
           {/* flavours */}
           <SelectionButtonGroup
@@ -175,35 +173,66 @@ export const CustomTeaScreen = () => {
             onPress={handleToppingPress}
             buttons={toppings}
           />
-        </View>
-      </ScrollView>
+          <View style={{ width: "90%", alignSelf: "center" }}>
+            <Text style={styles.itemLabel}>Item</Text>
+            <View style={styles.itemsBtns}>
+              <TouchableOpacity
+                disabled={item === 0}
+                onPress={() => setItem(item - 1)}
+              >
+                <AntDesign
+                  name="minus"
+                  size={20}
+                  color={item === 0 ? "#969696" : colors.text_primary}
+                />
+              </TouchableOpacity>
+              <Text
+                style={{
+                  color: colors.text_primary,
+                  fontFamily: fonts.medium,
+                  fontSize: 14,
+                }}
+              >
+                {item}
+              </Text>
+              <TouchableOpacity onPress={() => setItem(item + 1)}>
+                <AntDesign name="plus" size={20} color={colors.text_primary} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
+      </View>
       <View
         style={{
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          height: DeviceHeight * 0.1,
+          height: 123,
           width: DeviceWidth,
           paddingHorizontal: 20,
           backgroundColor: "#EFFAFF",
+          borderTopRightRadius: 20,
+          borderTopLeftRadius: 20,
+          position: "absolute",
+          bottom: 0,
         }}
       >
         <View style={{}}>
           <Text
             style={{
               color: colors.text_secondary,
-              fontSize: spacing.medium - 2,
-              paddingVertical: 3,
+              fontSize: 16,
+              fontFamily: fonts.medium,
             }}
           >
-            Total
+            Total Payment
           </Text>
           <Text
             style={{
               color: colors.primary,
-              fontSize: spacing.medium,
-              paddingVertical: 3,
-              fontWeight: "800",
+              fontSize: 22,
+              fontFamily: fonts.semiBold,
+              marginTop: 5,
             }}
           >
             4.50€
@@ -213,14 +242,14 @@ export const CustomTeaScreen = () => {
           title="Add to cart"
           buttonStyle={{
             backgroundColor: colors.primary,
-            borderRadius: 10,
-            paddingHorizontal: 20,
-            paddingVertical: 10,
+            borderRadius: 16,
+            height: 60,
+            width: 144,
           }}
           titleStyle={{
             color: colors.secondary,
-            fontSize: spacing.medium,
-            fontWeight: "800",
+            fontSize: 14,
+            fontFamily: fonts.semiBold,
           }}
         />
       </View>
@@ -258,12 +287,12 @@ export const SelectionButtonGroup = (props: {
           selectedIndex={props.selectedIndex}
           selectedButtonStyle={{
             backgroundColor: "#DBF4FF",
-            borderColor: colors.primary,
-            borderWidth: 1,
-            elevation: 1,
+            // borderColor: colors.primary,
+            borderWidth: 0,
             height: 50,
             marginRight: 10,
             borderRadius: 10,
+            paddingHorizontal: 15,
           }}
           buttonStyle={{
             height: 50,
@@ -306,7 +335,6 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: "center",
     alignItems: "center",
-    elevation: 10,
     borderRadius: 10,
   },
   header: {
@@ -330,5 +358,21 @@ const styles = StyleSheet.create({
     height: 226,
     width: 190,
     alignSelf: "center",
+  },
+  itemLabel: {
+    color: colors.text_primary,
+    fontSize: 16,
+    fontFamily: fonts.medium,
+  },
+  itemsBtns: {
+    flexDirection: "row",
+    height: 50,
+    borderWidth: 1,
+    borderColor: "#D8D8D8",
+    width: 112,
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 10,
+    borderRadius: 6,
   },
 });
