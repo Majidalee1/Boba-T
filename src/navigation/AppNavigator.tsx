@@ -22,17 +22,12 @@ export type AppStackParamList = {
   Checkout: undefined;
   CustomTea: undefined;
   Welcome: undefined;
-  Tabs: undefined;
+  Tabs: any;
 };
 
 export type TabParamList = {
-  Home: {
-    storeId: string;
-  };
-  Cart: {
-    cartId: string;
-    storeId: string;
-  };
+  Home: any;
+  Cart: any;
 };
 
 const NavigationStack = createNativeStackNavigator<AppStackParamList>();
@@ -127,7 +122,7 @@ export const Stack = () => {
         headerShown: false,
         gestureEnabled: true,
         gestureDirection: "horizontal",
-        title: "Home",
+        // title: "Home",
       }}
     >
       <NavigationStack.Screen name="Welcome" component={Welcome} />

@@ -39,6 +39,9 @@ interface Props {
 
 export const HomeScreen = ({ navigation, route }: Props) => {
   const [selectedCategory, setSelectedCategory] = useState("");
+  // const { categories, description, location, name, createdAt, by } =
+  //   route.params;
+  console.log("========>>store", route);
   return (
     <View style={styles.container}>
       <Header

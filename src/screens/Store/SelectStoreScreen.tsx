@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { RouteProp } from "@react-navigation/native";
 import {
   FlatList,
@@ -13,6 +13,14 @@ import {
 } from "react-native";
 import { WithLocalSvg } from "react-native-svg";
 import { NavigationProp } from "@react-navigation/native";
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  doc,
+  getDoc,
+  DocumentData,
+} from "firebase/firestore";
 import { AppStackParamList } from "../../navigation/AppNavigator";
 import { DeviceHeight, spacing } from "../../utils/Layouts";
 import { AvailableStores } from "../../utils/Models";
@@ -20,6 +28,7 @@ import { StoreCard } from "./components/StoreItem";
 import { Button } from "../../components/Button";
 import { colors } from "../../styles/colors";
 import { fonts } from "../../styles/fonts";
+import { db } from "./../../../firebaseConfig";
 
 const $container: ViewStyle = {
   flex: 1,
@@ -40,9 +49,22 @@ interface Props {
 
 export const Stores = (props: Props) => {
   const { navigation } = props;
-
-  // selected index
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [stores, setStores] = useState<any>(null);
+
+  useEffect(() => {
+    (async () => {
+      var allStores: DocumentData[] = [];
+      const querySnapshot = await getDocs(collection(db, "Stores"));
+      querySnapshot.forEach((doc) => {
+        var obj = doc.data();
+        console.log(doc.data());
+        obj.id = doc.id;
+        allStores.push(obj);
+      });
+      setStores([...allStores]);
+    })();
+  }, []);
 
   return (
     <View style={$container}>
@@ -68,7 +90,7 @@ export const Stores = (props: Props) => {
       </View>
 
       <FlatList
-        data={AvailableStores(20)}
+        data={stores}
         scrollEnabled={true}
         renderItem={({ item, index, separators }) => (
           <TouchableOpacity
@@ -91,8 +113,8 @@ export const Stores = (props: Props) => {
         bounces={true}
         columnWrapperStyle={{}}
         getItemLayout={(data, index) => ({
-          length: AvailableStores.length,
-          offset: AvailableStores.length * index,
+          length: stores.length,
+          offset: stores.length * index,
           index,
         })}
         contentContainerStyle={{
@@ -101,7 +123,14 @@ export const Stores = (props: Props) => {
           paddingBottom: 10,
         }}
       />
-      <Button title={"Continue"} onPress={() => navigation.navigate("Tabs")} />
+      <Button
+        title={"Continue"}
+        onPress={() =>
+          navigation.navigate("Tabs", {
+            store: { name: "jkk" },
+          })
+        }
+      />
       <StatusBar
         translucent={false}
         barStyle="dark-content"
