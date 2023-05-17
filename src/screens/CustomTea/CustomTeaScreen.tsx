@@ -344,7 +344,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 15,
-    // elevation: 10,
   },
   headerTitle: {
     flex: 1,
