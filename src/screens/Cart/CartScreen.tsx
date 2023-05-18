@@ -42,6 +42,7 @@ export const CartScreen = ({ navigation, route }: Props) => {
   // get cart items from storage
   const [CartItems, setCartItems] = useState<ICartItem[]>([]);
   async function getCartItems() {
+    // AsyncStorageService.clear();
     const cartItems = await AsyncStorageService.getItem("cart");
     setCartItems(cartItems ? cartItems : []);
   }

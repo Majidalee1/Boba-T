@@ -22,12 +22,20 @@ export type AppStackParamList = {
   Checkout: undefined;
   CustomTea: undefined;
   Welcome: undefined;
-  Tabs: any;
+  Tabs: {
+    screen: keyof TabParamList;
+    params?: TabParamList[keyof TabParamList];
+  };
 };
 
 export type TabParamList = {
-  Home: any;
-  Cart: any;
+  Home: {
+    storeId: string;
+  };
+  Cart: {
+    cartId?: string;
+    storeId?: string;
+  };
 };
 
 const NavigationStack = createNativeStackNavigator<AppStackParamList>();
@@ -56,7 +64,7 @@ export type TabScreenProps<T extends keyof TabParamList> = {
     goBack: () => void;
   };
   route: {
-    params: TabParamList[T];
+    params: [T];
   };
 };
 
@@ -69,31 +77,27 @@ export type CheckoutScrenNavigationProps = NavigationScreenProps<"Checkout">;
 export type CartScreenNavigationProps = TabScreenProps<"Cart">;
 
 function BottomTabNavigator() {
+  const getIconName = (payload: { name: string; isFocused: boolean }) => {
+    switch (payload.name) {
+      case "Home":
+        return payload.isFocused ? "homeActive" : "Home";
+      case "Cart":
+        return payload.isFocused ? "activeCart" : "cart";
+      default:
+        return "Home";
+    }
+  };
+
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused }) => {
-          let iconName;
-
-          if (route.name === "Home") {
-            iconName = focused ? (
-              <WithLocalSvg
-                asset={require("./../assets/icons/homeActive.svg")}
-              />
-            ) : (
-              <WithLocalSvg asset={require("./../assets/icons/Home.svg")} />
-            );
-          } else if (route.name === "Cart") {
-            iconName = focused ? (
-              <WithLocalSvg
-                asset={require("./../assets/icons/activeCart.svg")}
-              />
-            ) : (
-              <WithLocalSvg asset={require("./../assets/icons/cart.svg")} />
-            );
-          }
-
-          return iconName;
+      screenOptions={({ route }: { route: { name: string; params: any } }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          const iconName = getIconName({
+            name: route.name,
+            isFocused: focused,
+          });
+          const iconUrl = `./../assets/icons/cart.svg`;
+          return <WithLocalSvg asset={require(iconUrl)} />;
         },
       })}
     >
@@ -122,7 +126,7 @@ export const Stack = () => {
         headerShown: false,
         gestureEnabled: true,
         gestureDirection: "horizontal",
-        // title: "Home",
+        // title: "Home",H
       }}
     >
       <NavigationStack.Screen name="Welcome" component={Welcome} />

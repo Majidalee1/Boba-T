@@ -1,34 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { RouteProp } from "@react-navigation/native";
+import { NavigationProp, RouteProp } from "@react-navigation/native";
+import React, { useState } from "react";
 import {
   FlatList,
-  ScrollView,
-  TouchableHighlight,
+  StatusBar,
+  StyleSheet,
+  Text,
   TouchableOpacity,
   View,
   ViewStyle,
-  StyleSheet,
-  StatusBar,
-  Text,
 } from "react-native";
 import { WithLocalSvg } from "react-native-svg";
-import { NavigationProp } from "@react-navigation/native";
-import {
-  collection,
-  getDocs,
-  deleteDoc,
-  doc,
-  getDoc,
-  DocumentData,
-} from "firebase/firestore";
-import { AppStackParamList } from "../../navigation/AppNavigator";
-import { DeviceHeight, spacing } from "../../utils/Layouts";
-import { AvailableStores } from "../../utils/Models";
-import { StoreCard } from "./components/StoreItem";
 import { Button } from "../../components/Button";
+import { AppStackParamList, TabParamList } from "../../navigation/AppNavigator";
 import { colors } from "../../styles/colors";
 import { fonts } from "../../styles/fonts";
-import { db } from "./../../../firebaseConfig";
+import { useFireStore } from "../../utils/Hooks";
+import { DeviceHeight, spacing } from "../../utils/Layouts";
+import { IStore } from "../../utils/Models";
+import { StoreCard } from "./components/StoreItem";
 
 const $container: ViewStyle = {
   flex: 1,
@@ -50,21 +39,9 @@ interface Props {
 export const Stores = (props: Props) => {
   const { navigation } = props;
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [stores, setStores] = useState<any>(null);
+  const [stores, setStores] = useFireStore<IStore>("stores");
 
-  useEffect(() => {
-    (async () => {
-      var allStores: DocumentData[] = [];
-      const querySnapshot = await getDocs(collection(db, "Stores"));
-      querySnapshot.forEach((doc) => {
-        var obj = doc.data();
-        console.log(doc.data());
-        obj.id = doc.id;
-        allStores.push(obj);
-      });
-      setStores([...allStores]);
-    })();
-  }, []);
+  console.log("stores", stores);
 
   return (
     <View style={$container}>
@@ -127,7 +104,10 @@ export const Stores = (props: Props) => {
         title={"Continue"}
         onPress={() =>
           navigation.navigate("Tabs", {
-            store: { name: "jkk" },
+            screen: "Home",
+            params: {
+              storeId: stores[selectedIndex].id,
+            },
           })
         }
       />

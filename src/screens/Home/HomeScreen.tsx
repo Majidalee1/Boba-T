@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavigationProp, RouteProp } from "@react-navigation/native";
 import {
   FlatList,
@@ -11,14 +11,20 @@ import {
 } from "react-native";
 import { Header } from "../../components/Header";
 import { RowContainer } from "../../components/RowContainer";
-import { TabParamList } from "../../navigation/AppNavigator";
+import { AppStackParamList, TabParamList } from "../../navigation/AppNavigator";
 import { colors } from "../../styles/colors";
 import { DeviceWidth, spacing } from "../../utils/Layouts";
-import { GenerateCategories, GenerateProducts } from "../../utils/Models";
+import {
+  CreateProducts,
+  GenerateCategories,
+  GenerateProducts,
+  IProduct,
+} from "../../utils/Models";
 import { CategoryList } from "./Components/CategoryList";
 import { LocationHeader } from "./Components/LocationHeader";
 import { ProductCard } from "./Components/ProductCard";
 import { fonts } from "../../styles/fonts";
+import { useFireStore, useFireStoreWithFilter } from "../../utils/Hooks";
 
 const $container: ViewStyle = {
   flex: 1,
@@ -31,26 +37,31 @@ const $flatListContentContainer: ViewStyle = {
 };
 
 interface Props {
-  navigation: NavigationProp<TabParamList>;
   route: RouteProp<TabParamList, "Home">;
+  navigation: NavigationProp<AppStackParamList>;
 }
 
 // a helper component named Row Container that get the children as props and render them in a row
 
 export const HomeScreen = ({ navigation, route }: Props) => {
   const [selectedCategory, setSelectedCategory] = useState("");
-  // const { categories, description, location, name, createdAt, by } =
-  //   route.params;
-  console.log("========>>store", route);
+  const store_id = route.params.storeId;
+
+  const [products, setProducts] = useFireStoreWithFilter<IProduct>("products", {
+    field: "store",
+    operator: "==",
+    value: store_id,
+  });
+
+  useEffect(() => {
+    console.log("products", products);
+  }, [products]);
+
   return (
     <View style={styles.container}>
       <Header
         actions={{
           left: () => navigation.navigate("Store"),
-          right: () =>
-            navigation.navigate("Cart", {
-              storeId: route.params.storeId,
-            }),
         }}
       />
       <View>
@@ -114,11 +125,11 @@ export const HomeScreen = ({ navigation, route }: Props) => {
 
       <FlatList
         scrollEnabled={true}
-        data={GenerateProducts(6)}
+        data={products}
         maxToRenderPerBatch={8}
         initialNumToRender={8}
         renderItem={({ item }) => <ProductCard item={item} />}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id!}
         numColumns={2}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 20 }}

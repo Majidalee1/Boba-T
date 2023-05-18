@@ -1,5 +1,6 @@
 import { faker } from "@faker-js/faker";
-export interface IStores {
+import { FireStoreService } from "../services/FireStore";
+export interface IStore {
   id: string;
   name: string;
   icon: string;
@@ -7,9 +8,7 @@ export interface IStores {
   description: string;
 }
 
-// using faker to generate fake data
-
-export const AvailableStores = (count: number = 100): IStores[] => {
+export const GenerateStores = (count: number = 10): IStore[] => {
   const response = Array.from({ length: count }, (_, k) => ({
     id: faker.datatype.uuid(),
     name: faker.company.name(),
@@ -20,6 +19,13 @@ export const AvailableStores = (count: number = 100): IStores[] => {
   return response;
 };
 
+export const CreateStores = async (count: number = 10): Promise<IStore[]> => {
+  const StoreService = new FireStoreService<IStore>("stores");
+
+  const stores = GenerateStores(count);
+  return await StoreService.createMany(stores);
+};
+
 export const GenerateCategories = (count: number = 10): string[] => {
   const response = Array.from({ length: count }, (_, k) =>
     faker.commerce.department()
@@ -28,7 +34,7 @@ export const GenerateCategories = (count: number = 10): string[] => {
 };
 
 export interface IProduct {
-  id: string;
+  id?: string;
   name: string;
   price: string;
   category: string;
@@ -36,18 +42,29 @@ export interface IProduct {
   description: string;
   store: string;
 }
-export const GenerateProducts = (count: number = 10): IProduct[] => {
+export const GenerateProducts = (
+  store_id: string,
+  count: number = 10
+): IProduct[] => {
   const response = Array.from({ length: count }, (_, k) => ({
-    id: faker.datatype.uuid(),
     name: faker.commerce.productName(),
     price: faker.commerce.price(),
     category: faker.commerce.department(),
     image: faker.image.nature(),
     description: faker.lorem.paragraph(),
-    store: faker.company.name(),
+    store: store_id,
   }));
-  console.log({ response });
   return response;
+};
+
+export const CreateProducts = async (
+  store_id: string,
+  count: number = 10
+): Promise<IProduct[]> => {
+  const ProductService = new FireStoreService<IProduct>("products");
+  console.log("Creating products");
+  const products = GenerateProducts(store_id, count);
+  return await ProductService.createMany(products);
 };
 
 export interface ICartItem {
@@ -78,6 +95,5 @@ export const GenerateCartItems = ({
     }),
     total: faker.commerce.price(),
   }));
-  console.log({ response });
   return response;
 };

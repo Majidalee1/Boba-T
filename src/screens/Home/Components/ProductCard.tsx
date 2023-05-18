@@ -22,7 +22,6 @@ export const ProductCard = ({ item }: Props) => {
     const cartItems: ICartItem[] | null = await AsyncStorageService.getItem(
       "cart"
     );
-    console.log("cart items", cartItems);
     if (cartItems) {
       await AsyncStorageService.setItem("cart", [...cartItems, product]);
       if (!cartItems.includes(product)) {
@@ -84,9 +83,7 @@ export const ProductCard = ({ item }: Props) => {
                 fontFamily: fonts.bold,
                 color: colors.primary,
               }}
-            >
-              $ 5.00
-            </Text>
+            ></Text>
             <TouchableOpacity>
               <WithLocalSvg
                 asset={require("./../../../assets/icons/cartBtn.svg")}

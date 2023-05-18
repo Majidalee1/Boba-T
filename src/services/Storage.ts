@@ -22,6 +22,16 @@ class AsyncStorageService {
     }
   }
 
+  // clear all items from async storage
+  static async clear(): Promise<void> {
+    try {
+      await AsyncStorage.clear();
+    } catch (error) {
+      console.error(`Error clearing async storage`, error);
+      throw error;
+    }
+  }
+
   static async getItem<T extends StorageKeys>(
     key: T
   ): Promise<StorageData[T] | null> {
