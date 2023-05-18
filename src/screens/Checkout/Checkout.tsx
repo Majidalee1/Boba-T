@@ -24,6 +24,8 @@ interface Props {
   route: RouteProp<AppStackParamList, "Checkout">;
 }
 export const Checkout = ({ navigation, route }: Props) => {
+  const order_number = route.params.order_number as string;
+  console.log({ order_number });
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -47,7 +49,7 @@ export const Checkout = ({ navigation, route }: Props) => {
           }}
         >
           <QRCode
-            value={"value"}
+            value={order_number}
             color={colors.black}
             backgroundColor={colors.secondary}
             size={250}
@@ -62,7 +64,7 @@ export const Checkout = ({ navigation, route }: Props) => {
         >
           <Text style={styles.inputLabel}>Order no</Text>
           <View style={styles.inputView}>
-            <TextInput placeholder="Order no" style={styles.input} />
+            <TextInput placeholder={order_number!} style={styles.input} />
             <TouchableOpacity>
               <WithLocalSvg asset={require("./../../assets/icons/copy.svg")} />
             </TouchableOpacity>

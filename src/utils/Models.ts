@@ -76,6 +76,20 @@ export interface ICartItem {
   total?: string;
 }
 
+export interface IOrder {
+  id?: string;
+  store_id: string;
+  order_number: string;
+  total: string;
+  items: ICartItem[];
+  status: string;
+}
+
+export const createOrder = async (payload: IOrder): Promise<IOrder> => {
+  const OrderService = new FireStoreService<IOrder>("orders");
+  return await OrderService.create(payload);
+};
+
 export const GenerateCartItems = ({
   quantity,
   cart_id,

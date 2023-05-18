@@ -84,7 +84,7 @@ export const ProductCard = ({ item }: Props) => {
                 color: colors.primary,
               }}
             ></Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => handleAddToCart(item)}>
               <WithLocalSvg
                 asset={require("./../../../assets/icons/cartBtn.svg")}
               />

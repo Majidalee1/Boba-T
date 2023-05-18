@@ -19,7 +19,9 @@ export type AppStackParamList = {
   Details: {
     productId: string;
   };
-  Checkout: undefined;
+  Checkout: {
+    order_number: string | number;
+  };
   CustomTea: undefined;
   Welcome: undefined;
   Tabs: {
