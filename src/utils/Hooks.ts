@@ -40,7 +40,7 @@ export const useFireStoreWithFilter = <T extends Record<string, any>>(
       filter.operator,
       filter.value
     );
-    setData(data);
+    setData(data || []);
   }
 
   useEffect(() => {

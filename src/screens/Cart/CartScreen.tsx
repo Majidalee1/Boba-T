@@ -24,34 +24,46 @@ import { DeviceHeight, DeviceWidth, spacing } from "../../utils/Layouts";
 import { Button } from "../../components/Button";
 import { fonts } from "../../styles/fonts";
 
-import { GenerateCartItems, ICartItem, createOrder } from "../../utils/Models";
+import {
+  GenerateCartItems,
+  ICart,
+  ICartItem,
+  createOrder,
+} from "../../utils/Models";
 import { CartItem } from "./components/CartItem";
 import { useEffect, useState } from "react";
 import QRCode from "react-native-qrcode-svg";
 import { faker } from "@faker-js/faker";
 import { RowContainer } from "../../components/RowContainer";
 import AsyncStorageService from "../../services/Storage";
+import { FireStoreService } from "../../services/FireStore";
+import { DeviceId, FirestoreCollections } from "../../utils/constants";
 
 export interface Props {
   navigation: NavigationProp<AppStackParamList>;
   route: RouteProp<TabParamList, "Cart">;
 }
 export const CartScreen = ({ navigation, route }: Props) => {
-  const [isDialogVisible, setIsDialogVisible] = useState<boolean>(false);
-
-  // get cart items from storage
+  const cartService = new FireStoreService<ICart>(FirestoreCollections.Carts);
   const [CartItems, setCartItems] = useState<ICartItem[]>([]);
   async function getCartItems() {
-    // AsyncStorageService.clear();
-    const cartItems = await AsyncStorageService.getItem("cart");
-    console.log(cartItems);
-    setCartItems(cartItems ? cartItems : []);
+    const deviceId = await DeviceId();
+    const cart = await cartService.getById(deviceId);
+    const cartItems = await cartService.getSubCollection<ICartItem>(
+      cart?.id!,
+      FirestoreCollections.CartItems
+    );
+    setCartItems(cartItems || []);
   }
 
   const removeCartItem = async (id: string) => {
-    const newCartItems = CartItems.filter((item) => item.id !== id);
-    await AsyncStorageService.setItem("cart", newCartItems);
-    setCartItems(newCartItems);
+    const deviceId = await DeviceId();
+
+    return await cartService.deleteFromSubCollection(
+      deviceId,
+      FirestoreCollections.CartItems,
+      id
+    );
   };
 
   // on checkout generate order number
@@ -104,10 +116,10 @@ export const CartScreen = ({ navigation, route }: Props) => {
         renderItem={({ item, index, separators }) => (
           <CartItem
             id={item.id}
-            name={item.name}
+            name={item.product?.image}
             price={item.price}
             quantity={item.quantity}
-            total={item.total}
+            total={0}
             removeCartItem={removeCartItem}
           />
         )}

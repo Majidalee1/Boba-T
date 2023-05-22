@@ -25,6 +25,7 @@ import { LocationHeader } from "./Components/LocationHeader";
 import { ProductCard } from "./Components/ProductCard";
 import { fonts } from "../../styles/fonts";
 import { useFireStore, useFireStoreWithFilter } from "../../utils/Hooks";
+import { FirestoreCollections } from "../../utils/constants";
 
 const $container: ViewStyle = {
   flex: 1,
@@ -47,11 +48,13 @@ export const HomeScreen = ({ navigation, route }: Props) => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const store_id = route.params.storeId;
 
-  const [products, setProducts] = useFireStoreWithFilter<IProduct>("products", {
-    field: "store",
-    operator: "==",
-    value: store_id,
-  });
+  const [products, setProducts] =
+    useFireStoreWithFilter<IProduct>(FirestoreCollections.Products, {
+      field: "store",
+      operator: "==",
+      value: store_id,
+    }) || [];
+  console.log("products", products);
 
   useEffect(() => {
     console.log("products", products);

@@ -1,5 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { FireStoreService } from "../services/FireStore";
+import { Timestamp } from "firebase/firestore";
+import { FirestoreCollections } from "./constants";
 export interface IStore {
   id: string;
   name: string;
@@ -61,24 +63,32 @@ export const CreateProducts = async (
   store_id: string,
   count: number = 10
 ): Promise<IProduct[]> => {
-  const ProductService = new FireStoreService<IProduct>("products");
+  const ProductService = new FireStoreService<IProduct>(
+    FirestoreCollections.Products
+  );
   console.log("Creating products");
   const products = GenerateProducts(store_id, count);
+  console.log({ products });
   return await ProductService.createMany(products);
 };
 
 export interface ICartItem {
   id?: string;
-  name: string;
-  product_id?: string;
+  product?: Partial<IProduct>;
   price: string;
   quantity?: number;
-  total?: string;
 }
+
+export type ICart = {
+  id?: string;
+  deviceId: string;
+  createdAt: Date;
+  storeId: string;
+};
 
 export interface IOrder {
   id?: string;
-  store_id: string;
+  store_id?: string;
   order_number: string;
   total: string;
   items: ICartItem[];

@@ -5,35 +5,79 @@ import { WithLocalSvg } from "react-native-svg";
 import { Icon } from "@rneui/base";
 import { colors } from "../../../styles/colors";
 import { DeviceWidth, spacing } from "../../../utils/Layouts";
-import { ICartItem, IProduct } from "../../../utils/Models";
+import { ICart, ICartItem, IProduct } from "../../../utils/Models";
 import { AppStackParamList } from "../../../navigation/AppNavigator";
 import { NavigationProp, RouteProp } from "@react-navigation/native";
 import { RowContainer } from "../../../components/RowContainer";
 import AsyncStorageService from "../../../services/Storage";
 import { fonts } from "../../../styles/fonts";
+import { FireStoreService, db } from "../../../services/FireStore";
+import { DeviceId, FirestoreCollections } from "../../../utils/constants";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Firestore, Timestamp, doc } from "firebase/firestore";
+import { CartItem } from "../../Cart/components/CartItem";
 
 interface Props {
   item: IProduct;
 }
 
 export const ProductCard = ({ item }: Props) => {
-  const navigation = useNavigation();
+  const cartService = new FireStoreService<ICart>(FirestoreCollections.Carts);
+  const productService = new FireStoreService<IProduct>(
+    FirestoreCollections.Products
+  );
+
+  const navigation = useNavigation<NavigationProp<AppStackParamList>>();
+
+  // creat the cart if not exist
+  const createCart = async () => {
+    const deviceId = await DeviceId();
+    console.log("deviceId", deviceId);
+    const cart: ICart = {
+      id: deviceId,
+      storeId: item.store,
+      deviceId: deviceId,
+      createdAt: Timestamp.now().toDate(),
+    };
+    return await cartService.create(cart);
+  };
+
   const handleAddToCart = async (product: IProduct) => {
-    const cartItems: ICartItem[] | null = await AsyncStorageService.getItem(
-      "cart"
-    );
-    if (cartItems) {
-      await AsyncStorageService.setItem("cart", [...cartItems, product]);
-      if (!cartItems.includes(product)) {
-        await AsyncStorageService.setItem("cart", [...cartItems, product]);
-      }
-    } else {
-      await AsyncStorageService.setItem("cart", [product]);
+    const deviceId = await DeviceId();
+    let cart = await cartService.getById(deviceId);
+
+    if (!cart) {
+      cart = await createCart();
     }
+
+    console.log("cart", cart);
+
+    const cartItem: ICartItem = {
+      product: product,
+      quantity: 1,
+      price: product.price,
+    };
+
+    console.log("cartItem", cartItem);
+
+    const items = await cartService.createInSubCollection<ICartItem>(
+      cart.id!,
+      FirestoreCollections.CartItems,
+      cartItem
+    );
+
+    console.log("items", items);
   };
 
   return (
-    <Pressable key={item.id} onPress={() => navigation.navigate("Details")}>
+    <Pressable
+      key={item.id}
+      onPress={() =>
+        navigation.navigate("Details", {
+          productId: item.id!,
+        })
+      }
+    >
       <View
         style={{
           alignItems: "flex-start",
