@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -25,7 +25,11 @@ interface Props {
 }
 export const Checkout = ({ navigation, route }: Props) => {
   const order_number = route.params.order_number as string;
-  console.log({ order_number });
+  // const total = route.params.total as string;
+  // const status = route.params.status as string;
+  // const items = route.params.status as any;
+  const [orderNumber, setOrderNumber] = useState<string>(order_number);
+  // console.log({ order_number });
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -49,7 +53,7 @@ export const Checkout = ({ navigation, route }: Props) => {
           }}
         >
           <QRCode
-            value={order_number}
+            value={orderNumber}
             color={colors.black}
             backgroundColor={colors.secondary}
             size={250}
@@ -64,7 +68,11 @@ export const Checkout = ({ navigation, route }: Props) => {
         >
           <Text style={styles.inputLabel}>Order no</Text>
           <View style={styles.inputView}>
-            <TextInput placeholder={order_number!} style={styles.input} />
+            <TextInput
+              placeholder={orderNumber!}
+              style={styles.input}
+              onChangeText={(text) => setOrderNumber(text)}
+            />
             <TouchableOpacity>
               <WithLocalSvg asset={require("./../../assets/icons/copy.svg")} />
             </TouchableOpacity>

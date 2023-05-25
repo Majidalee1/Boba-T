@@ -55,6 +55,7 @@ export class FireStoreService<T extends Record<string, any> | BaseEntity> {
       messagingSenderId: "362244652400",
       appId: "1:362244652400:web:9465f5fc3f5818dcfd63b5",
       measurementId: "G-BHGLTWSSRB",
+
     });
     this.firestore = getFirestore(this.app);
 
@@ -78,6 +79,7 @@ export class FireStoreService<T extends Record<string, any> | BaseEntity> {
   async getById(id: string): Promise<T | null> {
     const Query = query(this.dbCollection, where("id", "==", id));
     const docSnapshot = await getDocs(Query);
+    console.log("===getById====",id,docSnapshot)
     if (docSnapshot.docs.length > 0) {
       return {
         id: docSnapshot.docs[0].id,
@@ -119,7 +121,7 @@ export class FireStoreService<T extends Record<string, any> | BaseEntity> {
 
     const data = await getDocs(querySnapshot);
 
-    console.log("data from firebase", { data });
+    console.log("data from firebase",data.docs );
     return data.docs.map(
       (doc) =>
         ({

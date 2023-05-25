@@ -2,6 +2,7 @@ import { faker } from "@faker-js/faker";
 import { FireStoreService } from "../services/FireStore";
 import { Timestamp } from "firebase/firestore";
 import { FirestoreCollections } from "./constants";
+import { ReactNode } from "react";
 export interface IStore {
   id: string;
   name: string;
@@ -45,6 +46,7 @@ export interface IProduct {
   description: string;
   store: string;
 }
+
 export const GenerateProducts = (
   store_id: string,
   count: number = 10
@@ -95,10 +97,16 @@ export interface IOrder {
   total: string;
   items: ICartItem[];
   status: string;
+  createdAt:string
 }
 
 export const createOrder = async (payload: IOrder): Promise<IOrder> => {
   const OrderService = new FireStoreService<IOrder>("orders");
+  return await OrderService.create(payload);
+};
+
+export const createCart = async (payload: ICart): Promise<ICart> => {
+  const OrderService = new FireStoreService<ICart>("Carts");
   return await OrderService.create(payload);
 };
 

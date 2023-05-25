@@ -4,7 +4,9 @@ import {
 } from "../../navigation/AppNavigator";
 import { Entypo, AntDesign } from "@expo/vector-icons";
 import { ButtonGroup } from "@rneui/themed";
-
+import { useFireStoreCreate } from "../../utils/Hooks";
+import { createCart } from "../../utils/Models";
+import { FirestoreCollections } from "../../utils/constants";
 import React, { useState } from "react";
 import {
   ScrollView,
@@ -100,6 +102,11 @@ export const CustomTeaScreen = ({ navigation }: Props) => {
     setJellyIndex(selectedIndex);
   };
 
+  const addToCart = () => {
+    createCart();
+    // useFireStoreCreate(FirestoreCollections.Carts, {});
+  };
+
   return (
     <View
       style={{
@@ -125,8 +132,6 @@ export const CustomTeaScreen = ({ navigation }: Props) => {
       <View
         style={{
           backgroundColor: colors.secondary,
-          // height: DeviceHeight,
-          // paddingBottom: DeviceHeight * 0.1,
           borderTopEndRadius: 30,
           borderTopStartRadius: 30,
           flex: 1,
@@ -251,6 +256,7 @@ export const CustomTeaScreen = ({ navigation }: Props) => {
             fontSize: 14,
             fontFamily: fonts.semiBold,
           }}
+          onPress={() => addToCart()}
         />
       </View>
       <StatusBar backgroundColor={colors.primary} barStyle="light-content" />

@@ -32,7 +32,7 @@ export const ProductCard = ({ item }: Props) => {
   // creat the cart if not exist
   const createCart = async () => {
     const deviceId = await DeviceId();
-    console.log("deviceId", deviceId);
+    // console.log("deviceId", deviceId);
     const cart: ICart = {
       id: deviceId,
       storeId: item.store,
@@ -49,17 +49,13 @@ export const ProductCard = ({ item }: Props) => {
     if (!cart) {
       cart = await createCart();
     }
-
     console.log("cart", cart);
-
     const cartItem: ICartItem = {
       product: product,
       quantity: 1,
       price: product.price,
     };
-
     console.log("cartItem", cartItem);
-
     const items = await cartService.createInSubCollection<ICartItem>(
       cart.id!,
       FirestoreCollections.CartItems,
@@ -94,7 +90,7 @@ export const ProductCard = ({ item }: Props) => {
       >
         <Image
           source={{
-            uri: "https://images.pexels.com/photos/90946/pexels-photo-90946.jpeg?cs=srgb&dl=pexels-math-90946.jpg&fm=jpg",
+            uri: item.image,
           }}
           style={{
             borderTopLeftRadius: 10,
@@ -127,7 +123,9 @@ export const ProductCard = ({ item }: Props) => {
                 fontFamily: fonts.bold,
                 color: colors.primary,
               }}
-            ></Text>
+            >
+              {item.price}
+            </Text>
             <TouchableOpacity onPress={() => handleAddToCart(item)}>
               <WithLocalSvg
                 asset={require("./../../../assets/icons/cartBtn.svg")}

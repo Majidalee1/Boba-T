@@ -12,7 +12,7 @@ import { WithLocalSvg } from "react-native-svg";
 import { Icon } from "@rneui/base";
 import { colors } from "../../../styles/colors";
 import { DeviceWidth, spacing } from "../../../utils/Layouts";
-import { ICart, ICartItem, IProduct } from "../../../utils/Models";
+import { ICart, ICartItem, IOrder, IProduct } from "../../../utils/Models";
 import { AppStackParamList } from "../../../navigation/AppNavigator";
 import { NavigationProp, RouteProp } from "@react-navigation/native";
 import { RowContainer } from "../../../components/RowContainer";
@@ -23,7 +23,7 @@ import { Firestore, Timestamp, doc } from "firebase/firestore";
 import moment from "moment";
 
 interface Props {
-  item: IProduct;
+  item: IOrder;
 }
 
 export const OrderCard = ({ item }: Props) => {
@@ -35,17 +35,17 @@ export const OrderCard = ({ item }: Props) => {
   const navigation = useNavigation<NavigationProp<AppStackParamList>>();
 
   // creat the cart if not exist
-  const createCart = async () => {
-    const deviceId = await DeviceId();
-    console.log("deviceId", deviceId);
-    const cart: ICart = {
-      id: deviceId,
-      storeId: item.store,
-      deviceId: deviceId,
-      createdAt: Timestamp.now().toDate(),
-    };
-    return await cartService.create(cart);
-  };
+  // const createCart = async () => {
+  //   const deviceId = await DeviceId();
+  //   console.log("deviceId", deviceId);
+  //   const cart: ICart = {
+  //     id: deviceId,
+  //     storeId: item.store,
+  //     deviceId: deviceId,
+  //     createdAt: Timestamp.now().toDate(),
+  //   };
+  //   return await cartService.create(cart);
+  // };
 
   return (
     <View
@@ -76,7 +76,7 @@ export const OrderCard = ({ item }: Props) => {
             fontFamily: fonts.regular,
           }}
         >
-          {moment(item.date).format("DD MMM YYYY")}
+          {moment(item.createdAt).format("DD MMM YYYY")}
         </Text>
         <RowContainer
           styles={{
@@ -101,7 +101,7 @@ export const OrderCard = ({ item }: Props) => {
                 color:
                   item.status === "Completed"
                     ? "#86EC36"
-                    : item.status === "Pending" && "#E9CA28",
+                    : item.status === "pending" && "#E9CA28",
               }}
             >
               {item.status}

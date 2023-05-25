@@ -17,6 +17,9 @@ import { OrderHistory } from "../screens/OrderHistory/OrderHistory";
 import { OrderDetails } from "../screens/OrderDetails/OrderDetails";
 import { ScanOrder } from "../screens/ScanOrder/ScanOrder";
 import { WithLocalSvg } from "react-native-svg";
+import { View, TouchableOpacity } from "react-native";
+import { color } from "@rneui/base";
+import { colors } from "../styles/colors";
 
 export type AppStackParamList = {
   Store: undefined;
@@ -25,6 +28,9 @@ export type AppStackParamList = {
   };
   Checkout: {
     order_number: string | number;
+    total: string;
+    items: any;
+    status: string;
   };
   CustomTea: undefined;
   Welcome: undefined;
@@ -164,11 +170,46 @@ function BottomTabNavigator() {
             ) : (
               <WithLocalSvg asset={require("./../assets/icons/profile.svg")} />
             );
+          } else if (route.name === "ScanOrder") {
+            iconName = focused ? (
+              <TouchableOpacity
+                style={{
+                  backgroundColor: colors.primary,
+                  width: 72,
+                  height: 72,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: 72 / 2,
+                  marginBottom: 30,
+                  borderWidth: 8,
+                  borderColor: "#F1F2F5",
+                }}
+              >
+                <WithLocalSvg asset={require("./../assets/icons/scan.svg")} />
+              </TouchableOpacity>
+            ) : (
+              <View
+                style={{
+                  backgroundColor: colors.primary,
+                  width: 72,
+                  height: 72,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: 72 / 2,
+                  marginBottom: 30,
+                  borderWidth: 8,
+                  borderColor: "#F1F2F5",
+                }}
+              >
+                <WithLocalSvg asset={require("./../assets/icons/scan.svg")} />
+              </View>
+            );
           }
 
           // You can return any component that you like here!
           return iconName;
         },
+        tabBarShowLabel: false,
       })}
     >
       <Tab.Screen
@@ -188,7 +229,12 @@ function BottomTabNavigator() {
       <Tab.Screen
         name="ScanOrder"
         component={ScanOrder}
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false,
+          tabBarStyle: {
+            display: "none",
+          },
+        }}
       />
       <Tab.Screen
         name="OrderHistory"

@@ -39,7 +39,7 @@ interface Props {
 export const Stores = (props: Props) => {
   const { navigation } = props;
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [stores, setStores] = useFireStore<IStore>("stores");
+  const [stores, setStores] = useFireStore<IStore>("Stores");
 
   console.log("stores", stores);
 

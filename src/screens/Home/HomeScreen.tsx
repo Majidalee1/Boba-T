@@ -19,12 +19,17 @@ import {
   GenerateCategories,
   GenerateProducts,
   IProduct,
+  IStore,
 } from "../../utils/Models";
 import { CategoryList } from "./Components/CategoryList";
 import { LocationHeader } from "./Components/LocationHeader";
 import { ProductCard } from "./Components/ProductCard";
 import { fonts } from "../../styles/fonts";
-import { useFireStore, useFireStoreWithFilter } from "../../utils/Hooks";
+import {
+  useFireStore,
+  useFireStoreWithFilter,
+  useFireStoreById,
+} from "../../utils/Hooks";
 import { FirestoreCollections } from "../../utils/constants";
 
 const $container: ViewStyle = {
@@ -48,16 +53,22 @@ export const HomeScreen = ({ navigation, route }: Props) => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const store_id = route.params.storeId;
 
-  const [products, setProducts] =
-    useFireStoreWithFilter<IProduct>(FirestoreCollections.Products, {
+  const [products, setProducts] = useFireStoreWithFilter<IProduct>(
+    FirestoreCollections.Products,
+    {
       field: "store",
       operator: "==",
       value: store_id,
-    }) || [];
-  console.log("products", products);
+    }
+  );
+  const [store, setStore] = useFireStoreById<IStore>(
+    FirestoreCollections.Stores,
+    store_id
+  );
+  console.log("store", store);
 
   useEffect(() => {
-    console.log("products", products);
+    console.log("store_id", typeof store_id);
   }, [products]);
 
   return (
@@ -68,7 +79,10 @@ export const HomeScreen = ({ navigation, route }: Props) => {
         }}
       />
       <View>
-        <LocationHeader navigation={navigation}></LocationHeader>
+        <LocationHeader
+          navigation={navigation}
+          name={store?.name}
+        ></LocationHeader>
         <TouchableOpacity
           style={{
             flexDirection: "row",
@@ -114,17 +128,19 @@ export const HomeScreen = ({ navigation, route }: Props) => {
       >
         Tea Category
       </Text>
-      <RowContainer
-        styles={{
-          marginVertical: 10,
-        }}
-      >
-        <CategoryList
-          categories={GenerateCategories(10)}
-          selectedCategory={selectedCategory}
-          onSelecCategory={(name) => setSelectedCategory(name)}
-        />
-      </RowContainer>
+      {store.length !== 0 && (
+        <RowContainer
+          styles={{
+            marginVertical: 10,
+          }}
+        >
+          <CategoryList
+            categories={store?.categories}
+            selectedCategory={selectedCategory}
+            onSelecCategory={(name) => setSelectedCategory(name)}
+          />
+        </RowContainer>
+      )}
 
       <FlatList
         scrollEnabled={true}

@@ -14,7 +14,7 @@ import { RowContainer } from "../../components/RowContainer";
 import { AppStackParamList, TabParamList } from "../../navigation/AppNavigator";
 import { colors } from "../../styles/colors";
 import { spacing } from "../../utils/Layouts";
-import { IProduct } from "../../utils/Models";
+import { IOrder, IProduct } from "../../utils/Models";
 import { LocationHeader } from "./components/LocationHeader";
 import { OrderCard } from "./components/OrderCard";
 import { fonts } from "../../styles/fonts";
@@ -39,64 +39,38 @@ interface Props {
 // a helper component named Row Container that get the children as props and render them in a row
 
 export const OrderHistory = ({ navigation, route }: Props) => {
-  const orders = [
-    {
-      id: "#98693923",
-      status: "Completed",
-      date: new Date(),
-      products: [
-        {
-          name: "Pastel purple Tea",
-          image:
-            "https://images.pexels.com/photos/90946/pexels-photo-90946.jpeg?cs=srgb&dl=pexels-math-90946.jpg&fm=jpg",
-          quantity: 1,
-          price: "$5.86",
-        },
-      ],
-    },
-    {
-      id: "#98693923",
-      status: "Pending",
-      date: new Date(),
-      products: [
-        {
-          name: "Pastel purple Tea",
-          image:
-            "https://images.pexels.com/photos/90946/pexels-photo-90946.jpeg?cs=srgb&dl=pexels-math-90946.jpg&fm=jpg",
-          quantity: 1,
-          price: "$5.86",
-        },
-      ],
-    },
-    {
-      id: "#98693923",
-      status: "Completed",
-      date: new Date(),
-      products: [
-        {
-          name: "Pastel purple Tea",
-          image:
-            "https://images.pexels.com/photos/90946/pexels-photo-90946.jpeg?cs=srgb&dl=pexels-math-90946.jpg&fm=jpg",
-          quantity: 1,
-          price: "$5.86",
-        },
-      ],
-    },
-    {
-      id: "#98693923",
-      status: "Pending",
-      date: new Date(),
-      products: [
-        {
-          name: "Pastel purple Tea",
-          image:
-            "https://images.pexels.com/photos/90946/pexels-photo-90946.jpeg?cs=srgb&dl=pexels-math-90946.jpg&fm=jpg",
-          quantity: 1,
-          price: "$5.86",
-        },
-      ],
-    },
-  ];
+  const [orders, setStores] = useFireStore<IOrder>("orders");
+  // console.log(typeof new Date().toString());
+  // const orders = [
+  //   {
+  //     id: "#98693923",
+  //     status: "Completed",
+  //     date: new Date(),
+  //     products: [
+  //       {
+  //         name: "Pastel purple Tea",
+  //         image:
+  //           "https://images.pexels.com/photos/90946/pexels-photo-90946.jpeg?cs=srgb&dl=pexels-math-90946.jpg&fm=jpg",
+  //         quantity: 1,
+  //         price: "$5.86",
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     id: "#98693923",
+  //     status: "Pending",
+  //     date: new Date(),
+  //     products: [
+  //       {
+  //         name: "Pastel purple Tea",
+  //         image:
+  //           "https://images.pexels.com/photos/90946/pexels-photo-90946.jpeg?cs=srgb&dl=pexels-math-90946.jpg&fm=jpg",
+  //         quantity: 1,
+  //         price: "$5.86",
+  //       },
+  //     ],
+  //   },
+  // ];
   return (
     <View style={styles.container}>
       <Header

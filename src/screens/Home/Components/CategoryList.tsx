@@ -13,13 +13,15 @@ export const CategoryList = (props: {
     showsHorizontalScrollIndicator={false}
     contentContainerStyle={{ paddingVertical: 10 }}
   >
-    {props.categories.map((item, index) => (
+    {props?.categories.map((item: any, index) => (
       <Pressable
         key={index}
-        onPress={() => props.onSelecCategory(item)}
+        onPress={() => props.onSelecCategory(item.name)}
         style={{
           backgroundColor:
-            props.selectedCategory === item ? colors.primary : colors.white,
+            props.selectedCategory === item.name
+              ? colors.primary
+              : colors.white,
           borderRadius: 10,
           height: 46,
           justifyContent: "center",
@@ -32,11 +34,13 @@ export const CategoryList = (props: {
           style={{
             fontSize: 14,
             color:
-              props.selectedCategory === item ? colors.secondary : "#1C1E23",
+              props.selectedCategory === item.name
+                ? colors.secondary
+                : "#1C1E23",
             fontFamily: fonts.regular,
           }}
         >
-          {item}
+          {item?.name}
         </Text>
       </Pressable>
     ))}

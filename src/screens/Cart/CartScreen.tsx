@@ -46,6 +46,7 @@ export interface Props {
 export const CartScreen = ({ navigation, route }: Props) => {
   const cartService = new FireStoreService<ICart>(FirestoreCollections.Carts);
   const [CartItems, setCartItems] = useState<ICartItem[]>([]);
+
   async function getCartItems() {
     const deviceId = await DeviceId();
     const cart = await cartService.getById(deviceId);
@@ -58,23 +59,29 @@ export const CartScreen = ({ navigation, route }: Props) => {
 
   const removeCartItem = async (id: string) => {
     const deviceId = await DeviceId();
-
-    return await cartService.deleteFromSubCollection(
+    await cartService.deleteFromSubCollection(
       deviceId,
       FirestoreCollections.CartItems,
       id
     );
+    getCartItems();
   };
 
   // on checkout generate order number
 
   const handleCheckout = async () => {
     const order_number = faker.random.alphaNumeric(6);
+    let total = 0;
+    CartItems.forEach((element) => {
+      total = total + Number(element.price);
+    });
+    console.log(total);
     const oderCreated = await createOrder({
       order_number,
       items: CartItems,
-      total: "17.54",
+      total: total.toString(),
       status: "pending",
+      createdAt: new Date().toString(),
     });
 
     console.log(oderCreated);
@@ -82,12 +89,20 @@ export const CartScreen = ({ navigation, route }: Props) => {
     if (oderCreated) {
       await AsyncStorageService.clear();
       setCartItems([]);
-      navigation.navigate("Checkout", { order_number });
+      navigation.navigate("Checkout", {
+        order_number,
+        items: CartItems,
+        total: total.toString(),
+        status: "pending",
+      });
     }
   };
 
   useEffect(() => {
-    getCartItems();
+    const unsubscribe = navigation.addListener("focus", () => {
+      getCartItems();
+    });
+    return unsubscribe;
   }, []);
 
   return (
@@ -116,10 +131,11 @@ export const CartScreen = ({ navigation, route }: Props) => {
         renderItem={({ item, index, separators }) => (
           <CartItem
             id={item.id}
-            name={item.product?.image}
+            product={item.product}
+            // name={item.product?.name}
             price={item.price}
             quantity={item.quantity}
-            total={0}
+            // total={0}
             removeCartItem={removeCartItem}
           />
         )}

@@ -10,6 +10,7 @@ import React from "react";
 interface Props {
   navigation: NavigationProp<AppStackParamList>;
   content?: Record<string, unknown>;
+  name: string;
 }
 
 export const LocationHeader = (props: Props) => (
@@ -41,7 +42,7 @@ export const LocationHeader = (props: Props) => (
           marginLeft: 10,
         }}
       >
-        Shop no 123 USA California
+        {props.name}
       </Text>
     </View>
     <TouchableOpacity onPress={() => props.navigation.navigate("Store")}>
