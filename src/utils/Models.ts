@@ -36,6 +36,7 @@ export const GenerateCategories = (count: number = 10): string[] => {
 };
 
 export interface IProduct {
+  [x: string]: ReactNode;
   id?: string;
   name: string;
   price: string;
@@ -84,6 +85,7 @@ export type ICart = {
   deviceId: string;
   createdAt: Date;
   storeId: string;
+  name:string
 };
 
 export interface IOrder {

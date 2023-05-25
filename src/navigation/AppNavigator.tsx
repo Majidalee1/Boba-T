@@ -12,6 +12,10 @@ import { CartScreen } from "../screens/Cart/CartScreen";
 import { CustomTeaScreen } from "../screens/CustomTea/CustomTeaScreen";
 import { Welcome } from "../screens/Welcome/Welcome";
 import { Checkout } from "../screens/Checkout/Checkout";
+import { Profile } from "../screens/Profile/Profile";
+import { OrderHistory } from "../screens/OrderHistory/OrderHistory";
+import { OrderDetails } from "../screens/OrderDetails/OrderDetails";
+import { ScanOrder } from "../screens/ScanOrder/ScanOrder";
 import { WithLocalSvg } from "react-native-svg";
 
 export type AppStackParamList = {
@@ -28,6 +32,10 @@ export type AppStackParamList = {
     screen: keyof TabParamList;
     params?: TabParamList[keyof TabParamList];
   };
+  OrderDetails: {
+    navigation: any;
+    route: any;
+  };
 };
 
 export type TabParamList = {
@@ -37,6 +45,18 @@ export type TabParamList = {
   Cart: {
     cartId?: string;
     storeId?: string;
+  };
+  OrderHistory: {
+    navigation: any;
+    route: any;
+  };
+  Profile: {
+    navigation: any;
+    route: any;
+  };
+  ScanOrder: {
+    navigation: any;
+    route: any;
   };
 };
 
@@ -72,34 +92,82 @@ export type TabScreenProps<T extends keyof TabParamList> = {
 
 export type TabsScreenNavigationProps = NavigationScreenProps<"Tabs">;
 export type WelcomeScreenNavigationProps = NavigationScreenProps<"Welcome">;
-export type HomeScreenNavigationProps = TabScreenProps<"Home">;
 export type ProductDetailsNavigationProps = NavigationScreenProps<"Details">;
 export type StoreScrenNavigationProps = NavigationScreenProps<"Store">;
 export type CheckoutScrenNavigationProps = NavigationScreenProps<"Checkout">;
+export type OrderDetailsNavigationProps = NavigationScreenProps<"OrderDetails">;
+
+export type OrderHistoryNavigationProps = TabScreenProps<"OrderHistory">;
+export type HomeScreenNavigationProps = TabScreenProps<"Home">;
 export type CartScreenNavigationProps = TabScreenProps<"Cart">;
+export type ProfileNavigationProps = TabScreenProps<"Profile">;
+export type ScanOrderNavigationProps = TabScreenProps<"ScanOrder">;
 
 function BottomTabNavigator() {
-  const getIconName = (payload: { name: string; isFocused: boolean }) => {
-    switch (payload.name) {
-      case "Home":
-        return payload.isFocused ? "homeActive" : "Home";
-      case "Cart":
-        return payload.isFocused ? "activeCart" : "cart";
-      default:
-        return "Home";
-    }
-  };
+  // const getIconName = (payload: { name: string; isFocused: boolean }) => {
+  //   switch (payload.name) {
+  //     case "Home":
+  //       return payload.isFocused ? "homeActive" : "Home";
+  //     case "Cart":
+  //       return payload.isFocused ? "activeCart" : "cart";
+  //     case "OrderHistory":
+  //       return payload.isFocused ? "activeCart" : "cart";
+  //     case "Profile":
+  //       return payload.isFocused ? "activeCart" : "cart";
+  //     default:
+  //       return "Home";
+  //   }
+  // };
 
   return (
     <Tab.Navigator
       screenOptions={({ route }: { route: { name: string; params: any } }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
-          const iconName = getIconName({
-            name: route.name,
-            isFocused: focused,
-          });
-          const iconUrl = `./../assets/icons/cart.svg`;
-          return <WithLocalSvg asset={require(iconUrl)} />;
+        tabBarIcon: ({ focused }) => {
+          // const iconName = getIconName({
+          //   name: route.name,
+          //   isFocused: focused,
+          // });
+          // console.log("===iconName===", typeof iconName);
+          // const iconUrl = `./../assets/icons/cart.svg`;
+          // return <WithLocalSvg asset={require(iconUrl)} />;
+          let iconName;
+
+          if (route.name === "Home") {
+            iconName = focused ? (
+              <WithLocalSvg
+                asset={require("./../assets/icons/homeActive.svg")}
+              />
+            ) : (
+              <WithLocalSvg asset={require("./../assets/icons/Home.svg")} />
+            );
+          } else if (route.name === "Cart") {
+            iconName = focused ? (
+              <WithLocalSvg
+                asset={require("./../assets/icons/activeCart.svg")}
+              />
+            ) : (
+              <WithLocalSvg asset={require("./../assets/icons/cart.svg")} />
+            );
+          } else if (route.name === "OrderHistory") {
+            iconName = focused ? (
+              <WithLocalSvg
+                asset={require("./../assets/icons/activeHistory.svg")}
+              />
+            ) : (
+              <WithLocalSvg asset={require("./../assets/icons/history.svg")} />
+            );
+          } else if (route.name === "Profile") {
+            iconName = focused ? (
+              <WithLocalSvg
+                asset={require("./../assets/icons/activeProfile.svg")}
+              />
+            ) : (
+              <WithLocalSvg asset={require("./../assets/icons/profile.svg")} />
+            );
+          }
+
+          // You can return any component that you like here!
+          return iconName;
         },
       })}
     >
@@ -115,6 +183,21 @@ function BottomTabNavigator() {
           cartId: "1",
           storeId: "1",
         }}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="ScanOrder"
+        component={ScanOrder}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="OrderHistory"
+        component={OrderHistory}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={Profile}
         options={{ headerShown: false }}
       />
     </Tab.Navigator>
@@ -137,12 +220,13 @@ export const Stack = () => {
       <NavigationStack.Screen
         name="Details"
         component={ProductDetails}
-        options={(props) => ({
+        options={() => ({
           title: `Profile: `,
         })}
       />
       <NavigationStack.Screen name="Checkout" component={Checkout} />
       <NavigationStack.Screen name="Store" component={Stores} />
+      <NavigationStack.Screen name="OrderDetails" component={OrderDetails} />
     </NavigationStack.Navigator>
   );
 };
@@ -173,7 +257,6 @@ export const AuthStack = () => {
 };
 
 export const AppNavigator = () => {
-  const user = true;
   return (
     <NavigationContainer
       theme={{
