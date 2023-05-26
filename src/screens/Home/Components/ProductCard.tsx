@@ -15,6 +15,7 @@ import { FireStoreService, db } from "../../../services/FireStore";
 import { DeviceId, FirestoreCollections } from "../../../utils/constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Firestore, Timestamp, doc } from "firebase/firestore";
+import { useToast } from "react-native-toast-notifications";
 import { CartItem } from "../../Cart/components/CartItem";
 
 interface Props {
@@ -22,6 +23,7 @@ interface Props {
 }
 
 export const ProductCard = ({ item }: Props) => {
+  const toast = useToast();
   const cartService = new FireStoreService<ICart>(FirestoreCollections.Carts);
   const productService = new FireStoreService<IProduct>(
     FirestoreCollections.Products
@@ -45,10 +47,11 @@ export const ProductCard = ({ item }: Props) => {
   const handleAddToCart = async (product: IProduct) => {
     const deviceId = await DeviceId();
     let cart = await cartService.getById(deviceId);
-
     if (!cart) {
-      cart = await createCart();
+      await createCart();
+      cart = await cartService.getById(deviceId);
     }
+    // console.log(cart);
     console.log("cart", cart);
     const cartItem: ICartItem = {
       product: product,
@@ -57,11 +60,17 @@ export const ProductCard = ({ item }: Props) => {
     };
     console.log("cartItem", cartItem);
     const items = await cartService.createInSubCollection<ICartItem>(
-      cart.id!,
+      cart.Id,
       FirestoreCollections.CartItems,
       cartItem
     );
-
+    toast.show("added successfully", {
+      type: "success",
+      placement: "bottom",
+      duration: 2000,
+      offset: 30,
+      animationType: "zoom-in",
+    });
     console.log("items", items);
   };
 
@@ -70,7 +79,7 @@ export const ProductCard = ({ item }: Props) => {
       key={item.id}
       onPress={() =>
         navigation.navigate("Details", {
-          productId: item.id!,
+          item: item,
         })
       }
     >
@@ -126,7 +135,14 @@ export const ProductCard = ({ item }: Props) => {
             >
               {item.price}
             </Text>
-            <TouchableOpacity onPress={() => handleAddToCart(item)}>
+            <TouchableOpacity
+              // onPress={() => handleAddToCart(item)}
+              onPress={() =>
+                navigation.navigate("CustomTea", {
+                  item: item,
+                })
+              }
+            >
               <WithLocalSvg
                 asset={require("./../../../assets/icons/cartBtn.svg")}
               />

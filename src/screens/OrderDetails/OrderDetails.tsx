@@ -32,71 +32,29 @@ import { RowContainer } from "../../components/RowContainer";
 import AsyncStorageService from "../../services/Storage";
 import { FireStoreService } from "../../services/FireStore";
 import { DeviceId, FirestoreCollections } from "../../utils/constants";
+import { useFireStoreToUpdate } from "../../utils/Hooks";
+import { useToast } from "react-native-toast-notifications";
 
 export interface Props {
   navigation: NavigationProp<AppStackParamList>;
   route: RouteProp<AppStackParamList, "OrderDetails">;
 }
 export const OrderDetails = ({ navigation, route }: Props) => {
-  const cartService = new FireStoreService<ICart>(FirestoreCollections.Carts);
-  const [CartItems, setCartItems] = useState<ICartItem[]>([]);
-  async function getCartItems() {
-    // const deviceId = await DeviceId();
-    // const cart = await cartService.getById(deviceId);
-    // const cartItems = await cartService.getSubCollection<ICartItem>(
-    //   cart?.id!,
-    //   FirestoreCollections.CartItems
-    // );
-    // setCartItems(cartItems || []);
-    setCartItems([
-      {
-        product: {
-          id: "1",
-          deviceId: "12",
-          createdAt: new Date(),
-          storeId: "1",
-          name: "Pastel purple Tea",
-        },
-        price: "$5.86",
-        quantity: 2,
-        id: "12",
-      },
-    ]);
-  }
+  const toast = useToast();
+  let { items, id, status } = route.params.item;
 
-  const removeCartItem = async (id: string) => {
-    const deviceId = await DeviceId();
-
-    return await cartService.deleteFromSubCollection(
-      deviceId,
-      FirestoreCollections.CartItems,
-      id
-    );
+  const markAsComplete = async () => {
+    await useFireStoreToUpdate(FirestoreCollections.Orders, id, {
+      status: "approved",
+    });
+    toast.show("order marked as a completed", {
+      type: "success",
+      placement: "bottom",
+      duration: 2000,
+      offset: 30,
+      animationType: "zoom-in",
+    });
   };
-
-  // on checkout generate order number
-
-  const handleCheckout = async () => {
-    // const order_number = faker.random.alphaNumeric(6);
-    // const oderCreated = await createOrder({
-    //   order_number,
-    //   items: CartItems,
-    //   total: "17.54",
-    //   status: "pending",
-    // });
-    // console.log(oderCreated);
-    // if (oderCreated) {
-    //   await AsyncStorageService.clear();
-    //   setCartItems([]);
-    //   navigation.navigate("Checkout", { order_number });
-    // }
-  };
-
-  useEffect(() => {
-    (async () => {
-      getCartItems();
-    })();
-  }, []);
 
   return (
     <View
@@ -116,16 +74,14 @@ export const OrderDetails = ({ navigation, route }: Props) => {
       </View>
       <FlatList
         // style={{ maxHeight: DeviceHeight * 0.8 }}
-        data={CartItems}
+        data={items}
         scrollEnabled={true}
         keyExtractor={(item) => item.id!}
         renderItem={({ item, index, separators }) => (
           <CartItem
             id={item.id}
-            // name={item.name}
             price={item.price}
             quantity={item.quantity}
-            removeCartItem={removeCartItem}
             product={item.product}
           />
         )}
@@ -134,9 +90,12 @@ export const OrderDetails = ({ navigation, route }: Props) => {
       />
 
       {/* checkout button */}
-      <View style={{ marginBottom: 20 }}>
-        <Button title={"Mark as complete"} onPress={() => handleCheckout()} />
-      </View>
+      {status !== "approved" && (
+        <View style={{ marginBottom: 20 }}>
+          <Button title={"Mark as complete"} onPress={() => markAsComplete()} />
+        </View>
+      )}
+
       <StatusBar translucent={false} backgroundColor="#FBFCFF" />
     </View>
   );

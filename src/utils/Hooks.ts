@@ -72,13 +72,22 @@ export const useFireStoreById = <T extends Record<string, any>>(
   return [data, setData] as const;
 };
 
+export const useFireStoreToUpdate = async <T extends Record<string, any>>(
+  collection: string,
+  id: string,
+  data: Partial<T>
+) => {
+  const storeService = new FireStoreService<T>(collection);
+
+  return await storeService.update(id,data);
+};
+
 // useStorewtih Create
 
 export const useFireStoreCreate = <T extends Record<string, any>>(
   collection: string,
   obj: T
 ) => {
-
   const storeService = new FireStoreService<T>(collection);
 
   // return await storeService.create(obj);

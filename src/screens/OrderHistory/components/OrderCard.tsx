@@ -67,7 +67,7 @@ export const OrderCard = ({ item }: Props) => {
             fontFamily: fonts.medium,
           }}
         >
-          {item.id}
+          #{item.order_number}
         </Text>
         <Text
           style={{
@@ -98,8 +98,9 @@ export const OrderCard = ({ item }: Props) => {
               style={{
                 fontSize: 14,
                 fontFamily: fonts.medium,
+                textTransform: "capitalize",
                 color:
-                  item.status === "Completed"
+                  item.status === "approved"
                     ? "#86EC36"
                     : item.status === "pending" && "#E9CA28",
               }}
@@ -109,7 +110,7 @@ export const OrderCard = ({ item }: Props) => {
           </View>
           <TouchableOpacity
             style={styles.detailsBtn}
-            onPress={() => navigation.navigate("OrderDetails")}
+            onPress={() => navigation.navigate("OrderDetails", { item: item })}
           >
             <Text style={styles.detailsBtnTxt}>Details</Text>
           </TouchableOpacity>

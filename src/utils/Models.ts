@@ -97,11 +97,12 @@ export interface IOrder {
   total: string;
   items: ICartItem[];
   status: string;
-  createdAt:string
+  createdAt:string,
+  deviceId:string
 }
 
 export const createOrder = async (payload: IOrder): Promise<IOrder> => {
-  const OrderService = new FireStoreService<IOrder>("orders");
+  const OrderService = new FireStoreService<IOrder>(FirestoreCollections.Orders);
   return await OrderService.create(payload);
 };
 

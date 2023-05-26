@@ -79,12 +79,14 @@ export class FireStoreService<T extends Record<string, any> | BaseEntity> {
   async getById(id: string): Promise<T | null> {
     const Query = query(this.dbCollection, where("id", "==", id));
     const docSnapshot = await getDocs(Query);
-    console.log("===getById====",id,docSnapshot)
+    // console.log("===getById====",id,docSnapshot)
+    // docSnapshot.docs.map((val,i)=>console.log("====>>>>>",val.id))
     if (docSnapshot.docs.length > 0) {
       return {
         id: docSnapshot.docs[0].id,
+        Id:docSnapshot.docs[0].id,
         ...docSnapshot.docs[0].data(),
-      } as T;
+      } as unknown as T;
     }
     return null;
   }
@@ -174,6 +176,8 @@ export class FireStoreService<T extends Record<string, any> | BaseEntity> {
     subCollectionName: string,
     data: SubType
   ): Promise<SubType[] | null> {
+    //     const parentDocRef = doc(database, "chats", route.params.id);
+    // const subcollectionRef = collection(parentDocRef, "messages");
     const docRef = doc(this.dbCollection, id);
     const subCollectionRef = collection(docRef, subCollectionName);
     const docRefInSubCollection = await addDoc(subCollectionRef, data);

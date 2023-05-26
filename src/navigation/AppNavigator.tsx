@@ -24,7 +24,7 @@ import { colors } from "../styles/colors";
 export type AppStackParamList = {
   Store: undefined;
   Details: {
-    productId: string;
+    item: any;
   };
   Checkout: {
     order_number: string | number;
@@ -32,7 +32,7 @@ export type AppStackParamList = {
     items: any;
     status: string;
   };
-  CustomTea: undefined;
+  CustomTea: { item: any };
   Welcome: undefined;
   Tabs: {
     screen: keyof TabParamList;

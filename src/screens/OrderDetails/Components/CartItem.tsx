@@ -14,7 +14,6 @@ export const CartItem = ({
   price,
   quantity,
   product,
-  removeCartItem,
 }: ICartItem & { removeCartItem: (id: string) => void }) => {
   const [itemCount, setItemCount] = useState<number>(quantity || 0);
   const [item, setItem] = useState(0);
@@ -23,7 +22,7 @@ export const CartItem = ({
       <Avatar
         rounded={true}
         source={{
-          uri: "https://source.unsplash.com/random/?portrait",
+          uri: product?.image,
         }}
         size="medium"
       />
@@ -54,11 +53,6 @@ export const CartItem = ({
           >
             {product?.name}
           </Text>
-          {/* <TouchableOpacity>
-            <WithLocalSvg
-              asset={require("./../../../assets/icons/Delete.svg")}
-            />
-          </TouchableOpacity> */}
         </RowContainer>
         <RowContainer
           styles={{
@@ -71,10 +65,7 @@ export const CartItem = ({
           }}
         >
           <View style={styles.itemsBtns}>
-            <TouchableOpacity
-              disabled={item === 0}
-              onPress={() => setItem(item - 1)}
-            >
+            <TouchableOpacity disabled={true} onPress={() => setItem(item - 1)}>
               <AntDesign
                 name="minus"
                 size={15}
@@ -88,9 +79,9 @@ export const CartItem = ({
                 fontSize: 14,
               }}
             >
-              {item}
+              {itemCount}
             </Text>
-            <TouchableOpacity onPress={() => setItem(item + 1)}>
+            <TouchableOpacity onPress={() => setItem(item + 1)} disabled={true}>
               <AntDesign name="plus" size={15} color={colors.text_primary} />
             </TouchableOpacity>
           </View>

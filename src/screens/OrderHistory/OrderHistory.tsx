@@ -20,6 +20,8 @@ import { OrderCard } from "./components/OrderCard";
 import { fonts } from "../../styles/fonts";
 import { useFireStore, useFireStoreWithFilter } from "../../utils/Hooks";
 import { FirestoreCollections } from "../../utils/constants";
+import { FireStoreService } from "../../services/FireStore";
+import { DeviceId } from "../../utils/constants";
 
 const $container: ViewStyle = {
   flex: 1,
@@ -39,38 +41,21 @@ interface Props {
 // a helper component named Row Container that get the children as props and render them in a row
 
 export const OrderHistory = ({ navigation, route }: Props) => {
-  const [orders, setStores] = useFireStore<IOrder>("orders");
-  // console.log(typeof new Date().toString());
-  // const orders = [
-  //   {
-  //     id: "#98693923",
-  //     status: "Completed",
-  //     date: new Date(),
-  //     products: [
-  //       {
-  //         name: "Pastel purple Tea",
-  //         image:
-  //           "https://images.pexels.com/photos/90946/pexels-photo-90946.jpeg?cs=srgb&dl=pexels-math-90946.jpg&fm=jpg",
-  //         quantity: 1,
-  //         price: "$5.86",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: "#98693923",
-  //     status: "Pending",
-  //     date: new Date(),
-  //     products: [
-  //       {
-  //         name: "Pastel purple Tea",
-  //         image:
-  //           "https://images.pexels.com/photos/90946/pexels-photo-90946.jpeg?cs=srgb&dl=pexels-math-90946.jpg&fm=jpg",
-  //         quantity: 1,
-  //         price: "$5.86",
-  //       },
-  //     ],
-  //   },
-  // ];
+  const cartService = new FireStoreService<IOrder>(FirestoreCollections.Orders);
+  const [orders, setOrders] = useState<IOrder[]>([]);
+
+  const getOrders = async () => {
+    const deviceId = await DeviceId();
+    const Orders = await cartService.getFiltered("deviceId", "==", deviceId);
+    setOrders(Orders || []);
+  };
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      getOrders();
+    });
+    return unsubscribe;
+  }, []);
+
   return (
     <View style={styles.container}>
       <Header
@@ -78,9 +63,7 @@ export const OrderHistory = ({ navigation, route }: Props) => {
           left: () => navigation.navigate("Store"),
         }}
       />
-      <View>
-        <LocationHeader navigation={navigation}></LocationHeader>
-      </View>
+      <LocationHeader navigation={navigation}></LocationHeader>
 
       <FlatList
         scrollEnabled={true}
@@ -91,6 +74,26 @@ export const OrderHistory = ({ navigation, route }: Props) => {
         keyExtractor={(item, index) => index.toString()}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 20 }}
+        ListEmptyComponent={() => (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              height: 300,
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: fonts.regular,
+                color: colors.text_primary,
+                fontSize: 14,
+              }}
+            >
+              There are no orders
+            </Text>
+          </View>
+        )}
       />
     </View>
   );

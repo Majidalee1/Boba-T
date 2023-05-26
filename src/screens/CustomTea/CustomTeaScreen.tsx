@@ -23,13 +23,21 @@ import { DeviceHeight, DeviceWidth, spacing } from "../../utils/Layouts";
 import { colors } from "../../styles/colors";
 import { fonts } from "../../styles/fonts";
 import { RowContainer } from "../../components/RowContainer";
+import { DeviceId } from "../../utils/constants";
+import { ICart, ICartItem, IProduct } from "../../utils/Models";
+import { useToast } from "react-native-toast-notifications";
+import { FireStoreService } from "../../services/FireStore";
+import { Timestamp } from "firebase/firestore";
 import { Button } from "@rneui/base";
 export interface Props {
   navigation: NavigationProp<AppStackParamList>;
   route: RouteProp<AppStackParamList, "CustomTea">;
 }
 
-export const CustomTeaScreen = ({ navigation }: Props) => {
+export const CustomTeaScreen = ({ navigation, route }: Props) => {
+  const { item } = route.params;
+  const toast = useToast();
+  const cartService = new FireStoreService<ICart>(FirestoreCollections.Carts);
   const [sizeIndex, setSizeIndex] = useState(0);
   const [iceIndex, setIceIndex] = useState(0);
   const [sugarIndex, setSugarIndex] = useState(0);
@@ -37,7 +45,7 @@ export const CustomTeaScreen = ({ navigation }: Props) => {
   const [milkIndex, setMilkIndex] = useState(0);
   const [toppingIndex, setToppingIndex] = useState(0);
   const [jellyIndex, setJellyIndex] = useState(0);
-  const [item, setItem] = useState(0);
+  const [items, setItems] = useState(1);
 
   const sizes = ["Small", "Large"];
   const ices = ["No", "Little", "Normal", "A lot"];
@@ -103,8 +111,55 @@ export const CustomTeaScreen = ({ navigation }: Props) => {
   };
 
   const addToCart = () => {
-    createCart();
+    // createCart();
     // useFireStoreCreate(FirestoreCollections.Carts, {});
+  };
+
+  // creat the cart if not exist
+  const createCart = async () => {
+    const deviceId = await DeviceId();
+    // console.log("deviceId", deviceId);
+    const cart: ICart = {
+      id: deviceId,
+      storeId: item.store,
+      deviceId: deviceId,
+      createdAt: Timestamp.now().toDate(),
+    };
+    return await cartService.create(cart);
+  };
+
+  const handleAddToCart = async (product: IProduct) => {
+    const deviceId = await DeviceId();
+    let cart = await cartService.getById(deviceId);
+    if (!cart) {
+      await createCart();
+      cart = await cartService.getById(deviceId);
+    }
+    product.flavour = teas[teaIndex];
+    product.size = sizes[sizeIndex];
+    product.ice = ices[iceIndex];
+    product.sugar = sugars[sugarIndex];
+    product.milk = milks[milkIndex];
+    product.topping = toppings[toppingIndex];
+    const cartItem: ICartItem = {
+      product: product,
+      quantity: items,
+      price: (Number(product.price) * items).toString(),
+    };
+    console.log("cartItem", cartItem);
+    await cartService.createInSubCollection<ICartItem>(
+      cart?.Id,
+      FirestoreCollections.CartItems,
+      cartItem
+    );
+    toast.show("added to cart", {
+      type: "success",
+      placement: "bottom",
+      duration: 2000,
+      offset: 30,
+      animationType: "zoom-in",
+    });
+    navigation.navigate("Cart");
   };
 
   return (
@@ -182,13 +237,13 @@ export const CustomTeaScreen = ({ navigation }: Props) => {
             <Text style={styles.itemLabel}>Item</Text>
             <View style={styles.itemsBtns}>
               <TouchableOpacity
-                disabled={item === 0}
-                onPress={() => setItem(item - 1)}
+                disabled={items === 1}
+                onPress={() => setItems(items - 1)}
               >
                 <AntDesign
                   name="minus"
                   size={20}
-                  color={item === 0 ? "#969696" : colors.text_primary}
+                  color={items === 0 ? "#969696" : colors.text_primary}
                 />
               </TouchableOpacity>
               <Text
@@ -198,9 +253,9 @@ export const CustomTeaScreen = ({ navigation }: Props) => {
                   fontSize: 14,
                 }}
               >
-                {item}
+                {items}
               </Text>
-              <TouchableOpacity onPress={() => setItem(item + 1)}>
+              <TouchableOpacity onPress={() => setItems(items + 1)}>
                 <AntDesign name="plus" size={20} color={colors.text_primary} />
               </TouchableOpacity>
             </View>
@@ -240,7 +295,7 @@ export const CustomTeaScreen = ({ navigation }: Props) => {
               marginTop: 5,
             }}
           >
-            4.50€
+            ${Number(item.price) * items}
           </Text>
         </View>
         <Button
@@ -256,7 +311,7 @@ export const CustomTeaScreen = ({ navigation }: Props) => {
             fontSize: 14,
             fontFamily: fonts.semiBold,
           }}
-          onPress={() => addToCart()}
+          onPress={() => handleAddToCart(item)}
         />
       </View>
       <StatusBar backgroundColor={colors.primary} barStyle="light-content" />

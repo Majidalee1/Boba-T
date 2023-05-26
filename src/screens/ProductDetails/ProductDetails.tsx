@@ -14,12 +14,60 @@ import { AppStackParamList } from "../../navigation/AppNavigator";
 import { Button } from "../../components/Button";
 import { colors } from "../../styles/colors";
 import { fonts } from "../../styles/fonts";
+import { DeviceId } from "../../utils/constants";
+import { FireStoreService } from "../../services/FireStore";
+import { FirestoreCollections } from "../../utils/constants";
+import { ICart, IProduct, ICartItem } from "../../utils/Models";
+import { Timestamp } from "firebase/firestore";
+import { useToast } from "react-native-toast-notifications";
 
 interface Props {
   navigation: NavigationProp<AppStackParamList>;
   route: RouteProp<AppStackParamList, "Details">;
 }
 export const ProductDetails = ({ navigation, route }: Props) => {
+  const toast = useToast();
+  let { item } = route.params;
+  const cartService = new FireStoreService<ICart>(FirestoreCollections.Carts);
+  // creat the cart if not exist
+  const createCart = async () => {
+    const deviceId = await DeviceId();
+    const cart: ICart = {
+      id: deviceId,
+      storeId: item.store,
+      deviceId: deviceId,
+      createdAt: Timestamp.now().toDate(),
+    };
+    return await cartService.create(cart);
+  };
+  const handleAddToCart = async (product: IProduct) => {
+    const deviceId = await DeviceId();
+    let cart = await cartService.getById(deviceId);
+    if (!cart) {
+      await createCart();
+      cart = await cartService.getById(deviceId);
+    }
+    console.log("cart", cart);
+    const cartItem: ICartItem = {
+      product: product,
+      quantity: 1,
+      price: product.price,
+    };
+    console.log("cartItem", cartItem);
+    const items = await cartService.createInSubCollection<ICartItem>(
+      cart.Id,
+      FirestoreCollections.CartItems,
+      cartItem
+    );
+    toast.show("added successfully", {
+      type: "success",
+      placement: "bottom",
+      duration: 2000,
+      offset: 30,
+      animationType: "zoom-in",
+    });
+    console.log("items", items);
+  };
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -31,30 +79,33 @@ export const ProductDetails = ({ navigation, route }: Props) => {
 
       <Image
         source={{
-          uri: "https://images.pexels.com/photos/90946/pexels-photo-90946.jpeg?cs=srgb&dl=pexels-math-90946.jpg&fm=jpg",
+          uri: item.image,
         }}
         style={styles.productImage}
       />
       <ScrollView>
         <View style={styles.productDetailMain}>
           <View style={styles.productDetailSec}>
-            <Text style={styles.productName}>Pastel purple</Text>
-            <Text style={styles.productPrice}>$5.84</Text>
+            <Text style={styles.productName}>{item.name}</Text>
+            <Text style={styles.productPrice}>${item.price}</Text>
           </View>
           <Text style={styles.detailLabel}>Details</Text>
           <Text style={styles.productDes}>
-            Pastel Purple is a popular beverage that is typically made with a
-            base of tea, milk, and chewy tapioca pearls. The pastel purple
-            color...
-            <TouchableOpacity>
+            {item.description}
+            {/* <TouchableOpacity>
               <Text style={styles.readMoreBtn}>Read more</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </Text>
         </View>
       </ScrollView>
       <Button
         title={"Add to Cart"}
-        onPress={() => navigation.navigate("Home", { storeId: "storeId" })}
+        // onPress={() => handleAddToCart(item)}
+        onPress={() =>
+          navigation.navigate("CustomTea", {
+            item: item,
+          })
+        }
       />
       <StatusBar barStyle="dark-content" backgroundColor="#FBFCFF" />
     </View>
