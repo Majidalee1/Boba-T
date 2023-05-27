@@ -20,7 +20,8 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { Button } from "../../components/Button";
 import { colors } from "../../styles/colors";
 import { fonts } from "../../styles/fonts";
-import { storage } from "../../../firebaseConfig";
+// import { storage } from "../../../firebaseConfig";
+import { storage } from "../../services/FireStore";
 import { DeviceId } from "../../utils/constants";
 import { FireStoreService } from "../../services/FireStore";
 import { FirestoreCollections } from "../../utils/constants";
@@ -50,7 +51,7 @@ export const Profile = ({ navigation, route }: Props) => {
 
   const pickImage = async () => {
     const deviceId = await DeviceId();
-    // const storageRef = ref(storage, `images/${deviceId}`);
+    const storageRef = ref(storage, `images/${deviceId}`);
 
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -62,30 +63,30 @@ export const Profile = ({ navigation, route }: Props) => {
     console.log(result);
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
-      // const response = await fetch(result.assets[0].uri);
-      // const blobFile = await response.blob();
-      // await uploadBytes(storageRef, blobFile)
-      //   .then(async (snapshot) => {
-      //     await getDownloadURL(storageRef)
-      //       .then(async (url) => {
-      //         toast.show("photo uploaded successfully", {
-      //           type: "success",
-      //           placement: "bottom",
-      //           duration: 2000,
-      //           offset: 30,
-      //           animationType: "zoom-in",
-      //         });
-      //         console.log("==========url==========", url);
-      //         setImage(url);
-      //       })
-      //       .catch((error) => {
-      //         console.log("=======>>>>error", error);
-      //       });
-      //   })
-      //   .catch((err) => {
-      //     console.log(err);
-      //   });
+      // setImage(result.assets[0].uri);
+      const response = await fetch(result.assets[0].uri);
+      const blobFile = await response.blob();
+      await uploadBytes(storageRef, blobFile)
+        .then(async (snapshot) => {
+          await getDownloadURL(storageRef)
+            .then(async (url) => {
+              toast.show("photo uploaded successfully", {
+                type: "success",
+                placement: "bottom",
+                duration: 2000,
+                offset: 30,
+                animationType: "zoom-in",
+              });
+              console.log("==========url==========", url);
+              setImage(url);
+            })
+            .catch((error) => {
+              console.log("=======>>>>error", error);
+            });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
   };
 

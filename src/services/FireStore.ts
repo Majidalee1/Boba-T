@@ -19,22 +19,23 @@ import {
   Query,
   setDoc,
 } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
+
+const app = initializeApp({
+  apiKey: "AIzaSyDcQReHS0ZGehjk6GGwoPQSyla62MOfcRY",
+  authDomain: "bubble-tea-f3d52.firebaseapp.com",
+  projectId: "bubble-tea-f3d52",
+  storageBucket: "bubble-tea-f3d52.appspot.com",
+  messagingSenderId: "362244652400",
+  appId: "1:362244652400:web:9465f5fc3f5818dcfd63b5",
+  measurementId: "G-BHGLTWSSRB",
+});
 
 export const db = (collectionName: string) => {
-  const app = initializeApp({
-    apiKey: "AIzaSyDcQReHS0ZGehjk6GGwoPQSyla62MOfcRY",
-    authDomain: "bubble-tea-f3d52.firebaseapp.com",
-    projectId: "bubble-tea-f3d52",
-    storageBucket: "bubble-tea-f3d52.appspot.com",
-    messagingSenderId: "362244652400",
-    appId: "1:362244652400:web:9465f5fc3f5818dcfd63b5",
-    measurementId: "G-BHGLTWSSRB",
-  });
-
   const firstore = getFirestore(app);
-
   return collection(firstore, collectionName);
 };
+export const storage = getStorage(app);
 
 interface BaseEntity {
   id: string;
