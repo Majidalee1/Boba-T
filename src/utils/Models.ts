@@ -87,7 +87,21 @@ export type ICart = {
   deviceId: string;
   createdAt: Date;
   storeId: string;
-  name:string
+  name: string;
+};
+export type IUser = {
+  name: string;
+  image: string;
+  phone: string;
+  dateOfBirth: Date;
+  id: string;
+};
+export type IToast = {
+  type: string;
+  placement: string;
+  duration: number;
+  offset: number;
+  animationType: string;
 };
 
 export interface IOrder {
@@ -97,12 +111,14 @@ export interface IOrder {
   total: string;
   items: ICartItem[];
   status: string;
-  createdAt:string,
-  deviceId:string
+  createdAt: string;
+  deviceId: string;
 }
 
 export const createOrder = async (payload: IOrder): Promise<IOrder> => {
-  const OrderService = new FireStoreService<IOrder>(FirestoreCollections.Orders);
+  const OrderService = new FireStoreService<IOrder>(
+    FirestoreCollections.Orders
+  );
   return await OrderService.create(payload);
 };
 

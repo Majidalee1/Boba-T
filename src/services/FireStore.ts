@@ -17,8 +17,8 @@ import {
   where,
   updateDoc,
   Query,
+  setDoc,
 } from "firebase/firestore";
-import { DataSnapshot, get } from "firebase/database";
 
 export const db = (collectionName: string) => {
   const app = initializeApp({
@@ -32,6 +32,7 @@ export const db = (collectionName: string) => {
   });
 
   const firstore = getFirestore(app);
+
   return collection(firstore, collectionName);
 };
 
@@ -55,14 +56,18 @@ export class FireStoreService<T extends Record<string, any> | BaseEntity> {
       messagingSenderId: "362244652400",
       appId: "1:362244652400:web:9465f5fc3f5818dcfd63b5",
       measurementId: "G-BHGLTWSSRB",
-
     });
     this.firestore = getFirestore(this.app);
-
     this.dbCollection = collection(this.firestore, collectionName);
   }
   async create(data: T): Promise<T> {
     const docRef = await addDoc(this.dbCollection, data);
+    const docSnapshot = await getDoc(docRef);
+    return { id: docSnapshot.id, ...docSnapshot.data() } as T;
+  }
+  async createById(id: string, data: T): Promise<T> {
+    const docRef = await doc(this.dbCollection, id);
+    setDoc(docRef, data);
     const docSnapshot = await getDoc(docRef);
     return { id: docSnapshot.id, ...docSnapshot.data() } as T;
   }
@@ -79,12 +84,12 @@ export class FireStoreService<T extends Record<string, any> | BaseEntity> {
   async getById(id: string): Promise<T | null> {
     const Query = query(this.dbCollection, where("id", "==", id));
     const docSnapshot = await getDocs(Query);
-    // console.log("===getById====",id,docSnapshot)
+    console.log("===getById====", id, docSnapshot);
     // docSnapshot.docs.map((val,i)=>console.log("====>>>>>",val.id))
     if (docSnapshot.docs.length > 0) {
       return {
         id: docSnapshot.docs[0].id,
-        Id:docSnapshot.docs[0].id,
+        Id: docSnapshot.docs[0].id,
         ...docSnapshot.docs[0].data(),
       } as unknown as T;
     }
@@ -123,7 +128,7 @@ export class FireStoreService<T extends Record<string, any> | BaseEntity> {
 
     const data = await getDocs(querySnapshot);
 
-    console.log("data from firebase",data.docs );
+    console.log("data from firebase", data.docs);
     return data.docs.map(
       (doc) =>
         ({

@@ -83,7 +83,6 @@ export const HomeScreen = ({ navigation, route }: Props) => {
             flexDirection: "row",
             marginTop: 10,
           }}
-          // onPress={() => navigation.navigate("CustomTea")}
         >
           <Text
             style={{

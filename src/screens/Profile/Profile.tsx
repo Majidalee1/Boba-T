@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   Image,
   ScrollView,
   TextInput,
+  Platform,
 } from "react-native";
 import { NavigationProp, RouteProp } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
@@ -15,24 +16,44 @@ import moment from "moment";
 import { Entypo } from "@expo/vector-icons";
 import { WithLocalSvg } from "react-native-svg";
 import { AppStackParamList, TabParamList } from "../../navigation/AppNavigator";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { Button } from "../../components/Button";
 import { colors } from "../../styles/colors";
 import { fonts } from "../../styles/fonts";
+import { storage } from "../../../firebaseConfig";
+import { DeviceId } from "../../utils/constants";
+import { FireStoreService } from "../../services/FireStore";
+import { FirestoreCollections } from "../../utils/constants";
+import { IUser } from "../../utils/Models";
+import { useToast } from "react-native-toast-notifications";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { Timestamp } from "firebase/firestore";
 
 interface Props {
   route: RouteProp<TabParamList, "Profile">;
   navigation: NavigationProp<AppStackParamList>;
 }
 export const Profile = ({ navigation, route }: Props) => {
+  const toast = useToast();
+  const usersService = new FireStoreService<IUser>(FirestoreCollections.Users);
   const [image, setImage] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [dateOfBirth, setDateOfBirth] = useState(new Date());
-  const [open, setOpen] = useState(false);
+  const [show, setShow] = useState(false);
+
+  const onChange = (event: any, selectedDate: any) => {
+    const currentDate = selectedDate;
+    setShow(false);
+    setDateOfBirth(currentDate);
+  };
 
   const pickImage = async () => {
+    const deviceId = await DeviceId();
+    // const storageRef = ref(storage, `images/${deviceId}`);
+
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
@@ -42,8 +63,86 @@ export const Profile = ({ navigation, route }: Props) => {
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
+      // const response = await fetch(result.assets[0].uri);
+      // const blobFile = await response.blob();
+      // await uploadBytes(storageRef, blobFile)
+      //   .then(async (snapshot) => {
+      //     await getDownloadURL(storageRef)
+      //       .then(async (url) => {
+      //         toast.show("photo uploaded successfully", {
+      //           type: "success",
+      //           placement: "bottom",
+      //           duration: 2000,
+      //           offset: 30,
+      //           animationType: "zoom-in",
+      //         });
+      //         console.log("==========url==========", url);
+      //         setImage(url);
+      //       })
+      //       .catch((error) => {
+      //         console.log("=======>>>>error", error);
+      //       });
+      //   })
+      //   .catch((err) => {
+      //     console.log(err);
+      //   });
     }
   };
+
+  const saveProfileData = async () => {
+    if (name === "" || phone === "" || !dateOfBirth) {
+      toast.show("Fill all the fields", {
+        type: "danger",
+        placement: "bottom",
+        duration: 2000,
+        offset: 30,
+        animationType: "zoom-in",
+      });
+      return;
+    }
+    const deviceId = await DeviceId();
+    const user = await usersService.getById(deviceId);
+    if (user) {
+      await usersService.update(deviceId, {
+        name,
+        image,
+        phone,
+        dateOfBirth,
+        id: deviceId,
+      });
+    } else {
+      await usersService.createById(deviceId, {
+        name,
+        image,
+        phone,
+        dateOfBirth,
+        id: deviceId,
+      });
+    }
+    toast.show("Profile saved successfully", {
+      type: "success",
+      placement: "bottom",
+      duration: 2000,
+      offset: 30,
+      animationType: "zoom-in",
+    });
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      (async () => {
+        const deviceId = await DeviceId();
+        const user = await usersService.getById(deviceId);
+        if (user) {
+          setName(user.name);
+          setPhone(user.phone);
+          setDateOfBirth(new Date(user.dateOfBirth.seconds * 1000));
+          setImage(user.image);
+        }
+      })();
+    });
+    return unsubscribe;
+  });
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -71,33 +170,43 @@ export const Profile = ({ navigation, route }: Props) => {
           <Text style={styles.label}>Name</Text>
           <TextInput
             style={styles.input}
-            placeholder="Emma Jane"
+            placeholder=""
             value={name}
-            onChangeText={setPhone}
+            onChangeText={setName}
           />
         </View>
         <View style={styles.inputView}>
           <Text style={styles.label}>Phone</Text>
           <TextInput
             style={styles.input}
-            placeholder="Emma Jane"
+            placeholder=""
             value={phone}
             onChangeText={setPhone}
+            keyboardType="number-pad"
           />
         </View>
         <View style={styles.inputView}>
           <Text style={styles.label}>Phone</Text>
           <TouchableOpacity
             style={styles.dateInput}
-            onPress={() => setOpen(true)}
+            onPress={() => setShow(true)}
           >
             <Text style={styles.dateTxt}>
               {moment(dateOfBirth).format("DD/MM/YYYY")}
             </Text>
           </TouchableOpacity>
+          {show && (
+            <DateTimePicker
+              testID="dateTimePicker"
+              value={dateOfBirth}
+              mode="date"
+              is24Hour={true}
+              onChange={onChange}
+            />
+          )}
         </View>
+        <Button title={"Save"} onPress={() => saveProfileData()} />
       </ScrollView>
-      {/* <Button title={"Add to Cart"} onPress={() => alert("")} /> */}
       <StatusBar barStyle="dark-content" backgroundColor="#FBFCFF" />
     </View>
   );
