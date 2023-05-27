@@ -13,23 +13,13 @@ import { Header } from "../../components/Header";
 import { RowContainer } from "../../components/RowContainer";
 import { AppStackParamList, TabParamList } from "../../navigation/AppNavigator";
 import { colors } from "../../styles/colors";
-import { DeviceWidth, spacing } from "../../utils/Layouts";
-import {
-  CreateProducts,
-  GenerateCategories,
-  GenerateProducts,
-  IProduct,
-  IStore,
-} from "../../utils/Models";
+import { spacing } from "../../utils/Layouts";
+import { IProduct, IStore } from "../../utils/Models";
 import { CategoryList } from "./Components/CategoryList";
 import { LocationHeader } from "./Components/LocationHeader";
 import { ProductCard } from "./Components/ProductCard";
 import { fonts } from "../../styles/fonts";
-import {
-  useFireStore,
-  useFireStoreWithFilter,
-  useFireStoreById,
-} from "../../utils/Hooks";
+import { useFireStoreWithFilter, useFireStoreById } from "../../utils/Hooks";
 import { FirestoreCollections } from "../../utils/constants";
 
 const $container: ViewStyle = {
@@ -71,6 +61,11 @@ export const HomeScreen = ({ navigation, route }: Props) => {
     console.log("store_id", typeof store_id);
   }, [products]);
 
+  const filteredProducts = products.filter((item) => {
+    return item.category.toLowerCase().includes(selectedCategory.toLowerCase());
+  });
+  // console.log("====filteredProducts====", filteredProducts);
+
   return (
     <View style={styles.container}>
       <Header
@@ -88,7 +83,7 @@ export const HomeScreen = ({ navigation, route }: Props) => {
             flexDirection: "row",
             marginTop: 10,
           }}
-          onPress={() => navigation.navigate("CustomTea")}
+          // onPress={() => navigation.navigate("CustomTea")}
         >
           <Text
             style={{
@@ -144,7 +139,7 @@ export const HomeScreen = ({ navigation, route }: Props) => {
 
       <FlatList
         scrollEnabled={true}
-        data={products}
+        data={filteredProducts}
         maxToRenderPerBatch={8}
         initialNumToRender={8}
         renderItem={({ item }) => <ProductCard item={item} />}
