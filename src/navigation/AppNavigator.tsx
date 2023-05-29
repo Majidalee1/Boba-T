@@ -5,20 +5,14 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { HomeScreen } from "../screens/Home/HomeScreen";
 import { ProductDetails } from "../screens/ProductDetails/ProductDetails";
-import { LoginScreen } from "../screens/Auth/Login";
 import { NavigationContainer } from "@react-navigation/native";
 import { Stores } from "../screens/Store/SelectStoreScreen";
 import { CartScreen } from "../screens/Cart/CartScreen";
 import { CustomTeaScreen } from "../screens/CustomTea/CustomTeaScreen";
 import { Welcome } from "../screens/Welcome/Welcome";
 import { Checkout } from "../screens/Checkout/Checkout";
-import { Profile } from "../screens/Profile/Profile";
-import { OrderHistory } from "../screens/OrderHistory/OrderHistory";
-import { OrderDetails } from "../screens/OrderDetails/OrderDetails";
-import { ScanOrder } from "../screens/ScanOrder/ScanOrder";
 import { WithLocalSvg } from "react-native-svg";
 import { View, TouchableOpacity } from "react-native";
-import { color } from "@rneui/base";
 import { colors } from "../styles/colors";
 
 export type AppStackParamList = {
@@ -38,10 +32,6 @@ export type AppStackParamList = {
     screen: keyof TabParamList;
     params?: TabParamList[keyof TabParamList];
   };
-  OrderDetails: {
-    navigation: any;
-    route: any;
-  };
 };
 
 export type TabParamList = {
@@ -51,18 +41,6 @@ export type TabParamList = {
   Cart: {
     cartId?: string;
     storeId?: string;
-  };
-  OrderHistory: {
-    navigation: any;
-    route: any;
-  };
-  Profile: {
-    navigation: any;
-    route: any;
-  };
-  ScanOrder: {
-    navigation: any;
-    route: any;
   };
 };
 
@@ -101,41 +79,15 @@ export type WelcomeScreenNavigationProps = NavigationScreenProps<"Welcome">;
 export type ProductDetailsNavigationProps = NavigationScreenProps<"Details">;
 export type StoreScrenNavigationProps = NavigationScreenProps<"Store">;
 export type CheckoutScrenNavigationProps = NavigationScreenProps<"Checkout">;
-export type OrderDetailsNavigationProps = NavigationScreenProps<"OrderDetails">;
 
-export type OrderHistoryNavigationProps = TabScreenProps<"OrderHistory">;
 export type HomeScreenNavigationProps = TabScreenProps<"Home">;
 export type CartScreenNavigationProps = TabScreenProps<"Cart">;
-export type ProfileNavigationProps = TabScreenProps<"Profile">;
-export type ScanOrderNavigationProps = TabScreenProps<"ScanOrder">;
 
 function BottomTabNavigator() {
-  // const getIconName = (payload: { name: string; isFocused: boolean }) => {
-  //   switch (payload.name) {
-  //     case "Home":
-  //       return payload.isFocused ? "homeActive" : "Home";
-  //     case "Cart":
-  //       return payload.isFocused ? "activeCart" : "cart";
-  //     case "OrderHistory":
-  //       return payload.isFocused ? "activeCart" : "cart";
-  //     case "Profile":
-  //       return payload.isFocused ? "activeCart" : "cart";
-  //     default:
-  //       return "Home";
-  //   }
-  // };
-
   return (
     <Tab.Navigator
       screenOptions={({ route }: { route: { name: string; params: any } }) => ({
         tabBarIcon: ({ focused }) => {
-          // const iconName = getIconName({
-          //   name: route.name,
-          //   isFocused: focused,
-          // });
-          // console.log("===iconName===", typeof iconName);
-          // const iconUrl = `./../assets/icons/cart.svg`;
-          // return <WithLocalSvg asset={require(iconUrl)} />;
           let iconName;
 
           if (route.name === "Home") {
@@ -206,7 +158,6 @@ function BottomTabNavigator() {
             );
           }
 
-          // You can return any component that you like here!
           return iconName;
         },
         tabBarShowLabel: false,
@@ -226,26 +177,6 @@ function BottomTabNavigator() {
         }}
         options={{ headerShown: false }}
       />
-      <Tab.Screen
-        name="ScanOrder"
-        component={ScanOrder}
-        options={{
-          headerShown: false,
-          tabBarStyle: {
-            display: "none",
-          },
-        }}
-      />
-      <Tab.Screen
-        name="OrderHistory"
-        component={OrderHistory}
-        options={{ headerShown: false }}
-      />
-      <Tab.Screen
-        name="Profile"
-        component={Profile}
-        options={{ headerShown: false }}
-      />
     </Tab.Navigator>
   );
 }
@@ -257,7 +188,6 @@ export const Stack = () => {
         headerShown: false,
         gestureEnabled: true,
         gestureDirection: "horizontal",
-        // title: "Home",H
       }}
     >
       <NavigationStack.Screen name="Welcome" component={Welcome} />
@@ -272,33 +202,7 @@ export const Stack = () => {
       />
       <NavigationStack.Screen name="Checkout" component={Checkout} />
       <NavigationStack.Screen name="Store" component={Stores} />
-      <NavigationStack.Screen name="OrderDetails" component={OrderDetails} />
     </NavigationStack.Navigator>
-  );
-};
-
-// auth stack
-export type AuthStackScreens = {
-  Login: undefined;
-  Register: undefined;
-  ForgotPassword: undefined;
-  ResetPassword: undefined;
-};
-
-const AuthNavigationStack = createNativeStackNavigator<AuthStackScreens>();
-
-export const AuthStack = () => {
-  return (
-    <AuthNavigationStack.Navigator
-      screenOptions={{
-        headerShown: false,
-        gestureEnabled: true,
-        gestureDirection: "horizontal",
-      }}
-      initialRouteName="Login"
-    >
-      <AuthNavigationStack.Screen name="Login" component={LoginScreen} />
-    </AuthNavigationStack.Navigator>
   );
 };
 
