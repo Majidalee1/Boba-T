@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "alimirStore",
-    "slug": "alimirStore",
+    "name": "Bubble Tea",
+    "slug": "bubbletea",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -23,10 +23,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.beerbal.bubbletea"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "08abc724-ffbe-4247-87c0-0bd947da3a69"
+      }
     }
   }
 }

@@ -13,6 +13,7 @@ import { Welcome } from "../screens/Welcome/Welcome";
 import { Checkout } from "../screens/Checkout/Checkout";
 import { WithLocalSvg } from "react-native-svg";
 import { View, TouchableOpacity } from "react-native";
+
 import { colors } from "../styles/colors";
 
 export type AppStackParamList = {
