@@ -60,7 +60,7 @@ export const ProductCard = ({ item }: Props) => {
     };
     console.log("cartItem", cartItem);
     const items = await cartService.createInSubCollection<ICartItem>(
-      cart.Id,
+      cart?.Id,
       FirestoreCollections.CartItems,
       cartItem
     );
@@ -136,12 +136,12 @@ export const ProductCard = ({ item }: Props) => {
               {item.price}
             </Text>
             <TouchableOpacity
-              // onPress={() => handleAddToCart(item)}
-              onPress={() =>
-                navigation.navigate("CustomTea", {
-                  item: item,
-                })
-              }
+              onPress={() => handleAddToCart(item)}
+              // onPress={() =>
+              //   navigation.navigate("CustomTea", {
+              //     item: item,
+              //   })
+              // }
             >
               <WithLocalSvg
                 asset={require("./../../../assets/icons/cartBtn.svg")}

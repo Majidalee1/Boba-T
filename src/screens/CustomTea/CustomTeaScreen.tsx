@@ -35,7 +35,7 @@ export interface Props {
 }
 
 export const CustomTeaScreen = ({ navigation, route }: Props) => {
-  const { item } = route.params;
+  const { store } = route.params;
   const toast = useToast();
   const cartService = new FireStoreService<ICart>(FirestoreCollections.Carts);
   const [sizeIndex, setSizeIndex] = useState(0);
@@ -121,30 +121,35 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
     // console.log("deviceId", deviceId);
     const cart: ICart = {
       id: deviceId,
-      storeId: item.store,
+      storeId: store.id,
       deviceId: deviceId,
       createdAt: Timestamp.now().toDate(),
     };
     return await cartService.create(cart);
   };
 
-  const handleAddToCart = async (product: IProduct) => {
+  const handleAddToCart = async () => {
     const deviceId = await DeviceId();
     let cart = await cartService.getById(deviceId);
     if (!cart) {
       await createCart();
       cart = await cartService.getById(deviceId);
     }
-    product.flavour = teas[teaIndex];
-    product.size = sizes[sizeIndex];
-    product.ice = ices[iceIndex];
-    product.sugar = sugars[sugarIndex];
-    product.milk = milks[milkIndex];
-    product.topping = toppings[toppingIndex];
+
     const cartItem: ICartItem = {
-      product: product,
       quantity: items,
-      price: (Number(product.price) * items).toString(),
+      price: (10 * items).toString(),
+      product: {
+        flavour: teas[teaIndex],
+        size: sizes[sizeIndex],
+        ice: ices[iceIndex],
+        sugar: sugars[sugarIndex],
+        milk: milks[milkIndex],
+        topping: toppings[toppingIndex],
+        name: "Pre made drink",
+        image:
+          "https://firebasestorage.googleapis.com/v0/b/bubble-tea-f3d52.appspot.com/o/images%2Fbubble-milk-tea-pearl-milk-tea-png%20copya%201.png?alt=media&token=12cfce12-e8b6-42b4-8390-169ad6788095&_gl=1*t8qeer*_ga*NTY5NjcyMzQxLjE2NjcyOTg2NDI.*_ga_CW55HF8NVT*MTY4NTYwNzUxNC4yOS4xLjE2ODU2MDc2MDIuMC4wLjA.",
+      },
     };
     console.log("cartItem", cartItem);
     await cartService.createInSubCollection<ICartItem>(
@@ -159,7 +164,7 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
       offset: 30,
       animationType: "zoom-in",
     });
-    navigation.navigate("Cart");
+    navigation.navigate("Tabs", { screen: "Cart" });
   };
 
   return (
@@ -229,9 +234,15 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
           />
           <SelectionButtonGroup
             selectedIndex={toppingIndex}
-            title="Choose Topping"
+            title="Topping"
             onPress={handleToppingPress}
             buttons={toppings}
+          />
+          <SelectionButtonGroup
+            selectedIndex={jellyIndex}
+            title="Jelly"
+            onPress={handleJellyPress}
+            buttons={jellies}
           />
           <View style={{ width: "90%", alignSelf: "center" }}>
             <Text style={styles.itemLabel}>Item</Text>
@@ -295,7 +306,7 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
               marginTop: 5,
             }}
           >
-            ${Number(item.price) * items}
+            ${10 * items}
           </Text>
         </View>
         <Button
@@ -311,7 +322,7 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
             fontSize: 14,
             fontFamily: fonts.semiBold,
           }}
-          onPress={() => handleAddToCart(item)}
+          onPress={() => handleAddToCart()}
         />
       </View>
       <StatusBar backgroundColor={colors.primary} barStyle="light-content" />

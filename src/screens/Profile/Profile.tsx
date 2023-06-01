@@ -20,7 +20,6 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { Button } from "../../components/Button";
 import { colors } from "../../styles/colors";
 import { fonts } from "../../styles/fonts";
-// import { storage } from "../../../firebaseConfig";
 import { storage } from "../../services/FireStore";
 import { DeviceId } from "../../utils/constants";
 import { FireStoreService } from "../../services/FireStore";

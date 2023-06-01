@@ -79,14 +79,14 @@ export const CartScreen = ({ navigation, route }: Props) => {
       total: total.toString(),
       status: "pending",
       createdAt: new Date().toString(),
-      deviceId: deviceId,
+      // deviceId: deviceId,
     });
 
     // console.log(oderCreated);
 
     if (oderCreated) {
       await cartService.delete(deviceId);
-      // await AsyncStorageService.clear();
+      await AsyncStorageService.clear();
       setCartItems([]);
       navigation.navigate("Checkout", {
         order_number,

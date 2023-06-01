@@ -60,7 +60,7 @@ export const Stores = (props: Props) => {
           height: DeviceHeight * 0.2,
         }}
       >
-        <Text style={styles.greetingMessage}>Hello John!</Text>
+        {/* <Text style={styles.greetingMessage}>Hello John!</Text> */}
         <Text style={styles.heading}>
           Choose A shop To Order your Bubble Tea
         </Text>

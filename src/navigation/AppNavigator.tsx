@@ -27,7 +27,7 @@ export type AppStackParamList = {
     items: any;
     status: string;
   };
-  CustomTea: { item: any };
+  CustomTea: { store: any };
   Welcome: undefined;
   Tabs: {
     screen: keyof TabParamList;

@@ -112,7 +112,6 @@ export interface IOrder {
   items: ICartItem[];
   status: string;
   createdAt: string;
-  deviceId: string;
 }
 
 export const createOrder = async (payload: IOrder): Promise<IOrder> => {

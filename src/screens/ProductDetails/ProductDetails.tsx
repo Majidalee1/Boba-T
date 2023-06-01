@@ -55,7 +55,7 @@ export const ProductDetails = ({ navigation, route }: Props) => {
     };
     console.log("cartItem", cartItem);
     const items = await cartService.createInSubCollection<ICartItem>(
-      cart.Id,
+      cart?.Id,
       FirestoreCollections.CartItems,
       cartItem
     );
@@ -100,12 +100,12 @@ export const ProductDetails = ({ navigation, route }: Props) => {
       </ScrollView>
       <Button
         title={"Add to Cart"}
-        // onPress={() => handleAddToCart(item)}
-        onPress={() =>
-          navigation.navigate("CustomTea", {
-            item: item,
-          })
-        }
+        onPress={() => handleAddToCart(item)}
+        // onPress={() =>
+        //   navigation.navigate("CustomTea", {
+        //     item: item,
+        //   })
+        // }
       />
       <StatusBar barStyle="dark-content" backgroundColor="#FBFCFF" />
     </View>
