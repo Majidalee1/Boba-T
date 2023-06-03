@@ -20,7 +20,7 @@ export const GenerateStores = (count: number = 10): IStore[] => {
 };
 
 export const CreateStores = async (count: number = 10): Promise<IStore[]> => {
-  const StoreService = new FireStoreService<IStore>("stores");
+  const StoreService = new FireStoreService<IStore>("Stores");
 
   const stores = GenerateStores(count);
   return await StoreService.createMany(stores);
@@ -61,7 +61,7 @@ export const CreateProducts = async (
   store_id: string,
   count: number = 10
 ): Promise<IProduct[]> => {
-  const ProductService = new FireStoreService<IProduct>("products");
+  const ProductService = new FireStoreService<IProduct>("Products");
   console.log("Creating products");
   const products = GenerateProducts(store_id, count);
   return await ProductService.createMany(products);
