@@ -19,25 +19,23 @@ import {
 } from "react-native";
 
 import { NavigationProp, RouteProp } from "@react-navigation/native";
-import { DeviceHeight, DeviceWidth, spacing } from "../../utils/Layouts";
+import { DeviceWidth, spacing } from "../../utils/Layouts";
 import { colors } from "../../styles/colors";
 import { fonts } from "../../styles/fonts";
-import { RowContainer } from "../../components/RowContainer";
 import { DeviceId } from "../../utils/constants";
-import { ICart, ICartItem, IProduct } from "../../utils/Models";
+import { ICart, ICartItem } from "../../utils/Models";
 import { useToast } from "react-native-toast-notifications";
 import { FireStoreService } from "../../services/FireStore";
 import { Timestamp } from "firebase/firestore";
 import { Button } from "@rneui/base";
-import { createOrder, createCustomOrder } from "../../utils/Models";
-import { faker } from "@faker-js/faker";
+import { IProduct } from "../../utils/Models";
 
 export interface Props {
   navigation: NavigationProp<AppStackParamList>;
-  route: RouteProp<AppStackParamList, "CustomTea">;
+  route: RouteProp<AppStackParamList, "CustomizeItem">;
 }
 
-export const CustomTeaScreen = ({ navigation, route }: Props) => {
+export const CustomizeItem = ({ navigation, route }: Props) => {
   const { store } = route.params;
   const toast = useToast();
   const cartService = new FireStoreService<ICart>(FirestoreCollections.Carts);
@@ -119,15 +117,14 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
     // console.log("deviceId", deviceId);
     const cart: ICart = {
       id: deviceId,
-      storeId: store.id,
+      storeId: store.store,
       deviceId: deviceId,
       createdAt: Timestamp.now().toDate(),
-      name: "",
     };
     return await cartService.create(cart);
   };
 
-  const handleAddToCart = async () => {
+  const handleAddToCart = async (product: IProduct) => {
     const deviceId = await DeviceId();
     let cart = await cartService.getById(deviceId);
     if (!cart) {
@@ -135,21 +132,16 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
       cart = await cartService.getById(deviceId);
     }
 
+    product.size = sizes[sizeIndex];
+    product.ice = ices[iceIndex];
+    product.sugar = sugars[sugarIndex];
     const cartItem: ICartItem = {
       quantity: items,
-      price: (10 * items).toString(),
-      product: {
-        flavour: teas[teaIndex],
-        size: sizes[sizeIndex],
-        ice: ices[iceIndex],
-        sugar: sugars[sugarIndex],
-        milk: milks[milkIndex],
-        topping: toppings[toppingIndex],
-        name: "Pre made drink",
-        image:
-          "https://firebasestorage.googleapis.com/v0/b/bubble-tea-f3d52.appspot.com/o/images%2Fbubble-milk-tea-pearl-milk-tea-png%20copya%201.png?alt=media&token=12cfce12-e8b6-42b4-8390-169ad6788095&_gl=1*t8qeer*_ga*NTY5NjcyMzQxLjE2NjcyOTg2NDI.*_ga_CW55HF8NVT*MTY4NTYwNzUxNC4yOS4xLjE2ODU2MDc2MDIuMC4wLjA.",
-      },
+      price: (Number(product.price) * items).toString(),
+      product: product,
     };
+
+    // console.log("cartItem", cartItem);
 
     await cartService.createInSubCollection<ICartItem>(
       cart?.Id,
@@ -164,36 +156,6 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
       animationType: "zoom-in",
     });
     navigation.navigate("Tabs", { screen: "Cart" });
-  };
-
-  const handleCheckout = async () => {
-    const order_number = faker.random.alphaNumeric(6);
-    const oderCreated = await createCustomOrder({
-      order_number,
-      product: {
-        quantity: items,
-        flavour: teas[teaIndex],
-        size: sizes[sizeIndex],
-        ice: ices[iceIndex],
-        sugar: sugars[sugarIndex],
-        milk: milks[milkIndex],
-        topping: toppings[toppingIndex],
-        name: "Pre made drink",
-        price: (10 * items).toString(),
-        image:
-          "https://firebasestorage.googleapis.com/v0/b/bubble-tea-f3d52.appspot.com/o/images%2Fbubble-milk-tea-pearl-milk-tea-png%20copya%201.png?alt=media&token=12cfce12-e8b6-42b4-8390-169ad6788095&_gl=1*t8qeer*_ga*NTY5NjcyMzQxLjE2NjcyOTg2NDI.*_ga_CW55HF8NVT*MTY4NTYwNzUxNC4yOS4xLjE2ODU2MDc2MDIuMC4wLjA.",
-      },
-      total: (10 * items).toString(),
-      status: "pending",
-      createdAt: new Date().toString(),
-      orderType: "custom",
-    });
-
-    if (oderCreated) {
-      navigation.navigate("Checkout", {
-        order_number: order_number,
-      });
-    }
   };
 
   return (
@@ -211,12 +173,12 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
         >
           <Entypo name="chevron-small-left" size={24} color="black" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}> Customizable Tea</Text>
+        <Text style={styles.headerTitle}>{store.name}</Text>
       </View>
-      <Image
+      {/* <Image
         source={require("./../../assets/images/bubble-milk.png")}
         style={styles.productImage}
-      />
+      /> */}
 
       <View
         style={{
@@ -230,13 +192,6 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
           contentContainerStyle={{ paddingBottom: 150 }}
           showsVerticalScrollIndicator={false}
         >
-          {/* flavours */}
-          <SelectionButtonGroup
-            selectedIndex={teaIndex}
-            title="Choose Flavour"
-            onPress={handleTeaPress}
-            buttons={teas}
-          />
           <SelectionButtonGroup
             selectedIndex={sizeIndex}
             title="Choose Size"
@@ -254,24 +209,6 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
             title="Choose Sugar"
             onPress={handleSugarPress}
             buttons={sugars}
-          />
-          <SelectionButtonGroup
-            selectedIndex={milkIndex}
-            title="Choose Milk"
-            onPress={handleMilkPress}
-            buttons={milks}
-          />
-          <SelectionButtonGroup
-            selectedIndex={toppingIndex}
-            title="Topping"
-            onPress={handleToppingPress}
-            buttons={toppings}
-          />
-          <SelectionButtonGroup
-            selectedIndex={jellyIndex}
-            title="Jelly"
-            onPress={handleJellyPress}
-            buttons={jellies}
           />
           <View style={{ width: "90%", alignSelf: "center" }}>
             <Text style={styles.itemLabel}>Item</Text>
@@ -335,11 +272,11 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
               marginTop: 5,
             }}
           >
-            ${10 * items}
+            ${store.price * items}
           </Text>
         </View>
         <Button
-          title="Place Order"
+          title="Add to cart"
           buttonStyle={{
             backgroundColor: colors.primary,
             borderRadius: 16,
@@ -351,7 +288,7 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
             fontSize: 14,
             fontFamily: fonts.semiBold,
           }}
-          onPress={() => handleCheckout()}
+          onPress={() => handleAddToCart(store)}
         />
       </View>
       <StatusBar backgroundColor={colors.primary} barStyle="light-content" />

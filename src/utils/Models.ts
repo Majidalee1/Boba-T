@@ -4,6 +4,7 @@ import { Timestamp } from "firebase/firestore";
 import { FirestoreCollections } from "./constants";
 import { ReactNode } from "react";
 export interface IStore {
+  [x: string]: string;
   id: string;
   name: string;
   icon: string;
@@ -83,6 +84,7 @@ export interface ICartItem {
 }
 
 export type ICart = {
+  Id<T>(Id: any, CartItems: FirestoreCollections): unknown;
   id?: string;
   deviceId: string;
   createdAt: Date;
@@ -112,10 +114,29 @@ export interface IOrder {
   items: ICartItem[];
   status: string;
   createdAt: string;
+  orderType: string;
+}
+export interface ICutomOrder {
+  id?: string;
+  store_id?: string;
+  order_number: string;
+  total: string;
+  status: string;
+  createdAt: string;
+  product: object;
+  orderType: string;
 }
 
 export const createOrder = async (payload: IOrder): Promise<IOrder> => {
   const OrderService = new FireStoreService<IOrder>(
+    FirestoreCollections.Orders
+  );
+  return await OrderService.create(payload);
+};
+export const createCustomOrder = async (
+  payload: ICutomOrder
+): Promise<ICutomOrder> => {
+  const OrderService = new FireStoreService<ICutomOrder>(
     FirestoreCollections.Orders
   );
   return await OrderService.create(payload);

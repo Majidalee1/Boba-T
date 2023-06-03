@@ -100,12 +100,11 @@ export const ProductDetails = ({ navigation, route }: Props) => {
       </ScrollView>
       <Button
         title={"Add to Cart"}
-        onPress={() => handleAddToCart(item)}
-        // onPress={() =>
-        //   navigation.navigate("CustomTea", {
-        //     item: item,
-        //   })
-        // }
+        onPress={() =>
+          navigation.navigate("CustomizeItem", {
+            store: item,
+          })
+        }
       />
       <StatusBar barStyle="dark-content" backgroundColor="#FBFCFF" />
     </View>
@@ -115,8 +114,6 @@ export const ProductDetails = ({ navigation, route }: Props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // alignItems: "center",
-    // justifyContent: "center",
     backgroundColor: "#FBFCFF",
   },
   text: {

@@ -11,6 +11,8 @@ import { CartScreen } from "../screens/Cart/CartScreen";
 import { CustomTeaScreen } from "../screens/CustomTea/CustomTeaScreen";
 import { Welcome } from "../screens/Welcome/Welcome";
 import { Checkout } from "../screens/Checkout/Checkout";
+import { Profile } from "../screens/Profile/Profile";
+import { CustomizeItem } from "../screens/CustomizeItem/customizeItem";
 import { WithLocalSvg } from "react-native-svg";
 import { View, TouchableOpacity } from "react-native";
 
@@ -33,6 +35,9 @@ export type AppStackParamList = {
     screen: keyof TabParamList;
     params?: TabParamList[keyof TabParamList];
   };
+  CustomizeItem: {
+    store: any;
+  };
 };
 
 export type TabParamList = {
@@ -43,6 +48,7 @@ export type TabParamList = {
     cartId?: string;
     storeId?: string;
   };
+  Profile: {};
 };
 
 const NavigationStack = createNativeStackNavigator<AppStackParamList>();
@@ -80,9 +86,12 @@ export type WelcomeScreenNavigationProps = NavigationScreenProps<"Welcome">;
 export type ProductDetailsNavigationProps = NavigationScreenProps<"Details">;
 export type StoreScrenNavigationProps = NavigationScreenProps<"Store">;
 export type CheckoutScrenNavigationProps = NavigationScreenProps<"Checkout">;
+export type CustomizeItemScrenNavigationProps =
+  NavigationScreenProps<"CustomizeItem">;
 
 export type HomeScreenNavigationProps = TabScreenProps<"Home">;
 export type CartScreenNavigationProps = TabScreenProps<"Cart">;
+export type ProfileNavigationProps = TabScreenProps<"Profile">;
 
 function BottomTabNavigator() {
   return (
@@ -178,6 +187,11 @@ function BottomTabNavigator() {
         }}
         options={{ headerShown: false }}
       />
+      <Tab.Screen
+        name="Profile"
+        component={Profile}
+        options={{ headerShown: false }}
+      />
     </Tab.Navigator>
   );
 }
@@ -203,6 +217,7 @@ export const Stack = () => {
       />
       <NavigationStack.Screen name="Checkout" component={Checkout} />
       <NavigationStack.Screen name="Store" component={Stores} />
+      <NavigationStack.Screen name="CustomizeItem" component={CustomizeItem} />
     </NavigationStack.Navigator>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { NavigationProp, RouteProp } from "@react-navigation/native";
 import {
   FlatList,
@@ -74,16 +74,12 @@ export const HomeScreen = ({ navigation, route }: Props) => {
         }}
       />
       <View>
-        <LocationHeader
-          navigation={navigation}
-          name={store?.name}
-        ></LocationHeader>
+        <LocationHeader navigation={navigation} name={store?.name} />
         <TouchableOpacity
           style={{
             flexDirection: "row",
             marginTop: 10,
           }}
-          onPress={() => navigation.navigate("CustomTea", { store: store })}
         >
           <Text
             style={{
@@ -103,7 +99,10 @@ export const HomeScreen = ({ navigation, route }: Props) => {
           <Text style={styles.bannerTxt}>
             Make Your Own Customizable Bubble Tea
           </Text>
-          <TouchableOpacity style={styles.makeBtn}>
+          <TouchableOpacity
+            style={styles.makeBtn}
+            onPress={() => navigation.navigate("CustomTea", { store: store })}
+          >
             <Text style={styles.makeBtnTxt}>Make</Text>
           </TouchableOpacity>
         </View>

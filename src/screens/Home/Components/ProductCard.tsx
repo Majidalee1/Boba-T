@@ -2,21 +2,17 @@ import React from "react";
 import { Image, Text, Pressable, View, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { WithLocalSvg } from "react-native-svg";
-import { Icon } from "@rneui/base";
 import { colors } from "../../../styles/colors";
-import { DeviceWidth, spacing } from "../../../utils/Layouts";
+import { DeviceWidth } from "../../../utils/Layouts";
 import { ICart, ICartItem, IProduct } from "../../../utils/Models";
 import { AppStackParamList } from "../../../navigation/AppNavigator";
-import { NavigationProp, RouteProp } from "@react-navigation/native";
+import { NavigationProp } from "@react-navigation/native";
 import { RowContainer } from "../../../components/RowContainer";
-import AsyncStorageService from "../../../services/Storage";
 import { fonts } from "../../../styles/fonts";
-import { FireStoreService, db } from "../../../services/FireStore";
+import { FireStoreService } from "../../../services/FireStore";
 import { DeviceId, FirestoreCollections } from "../../../utils/constants";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Firestore, Timestamp, doc } from "firebase/firestore";
+import { Timestamp } from "firebase/firestore";
 import { useToast } from "react-native-toast-notifications";
-import { CartItem } from "../../Cart/components/CartItem";
 
 interface Props {
   item: IProduct;
@@ -25,16 +21,11 @@ interface Props {
 export const ProductCard = ({ item }: Props) => {
   const toast = useToast();
   const cartService = new FireStoreService<ICart>(FirestoreCollections.Carts);
-  const productService = new FireStoreService<IProduct>(
-    FirestoreCollections.Products
-  );
-
   const navigation = useNavigation<NavigationProp<AppStackParamList>>();
 
   // creat the cart if not exist
   const createCart = async () => {
     const deviceId = await DeviceId();
-    // console.log("deviceId", deviceId);
     const cart: ICart = {
       id: deviceId,
       storeId: item.store,
@@ -51,7 +42,6 @@ export const ProductCard = ({ item }: Props) => {
       await createCart();
       cart = await cartService.getById(deviceId);
     }
-    // console.log(cart);
     console.log("cart", cart);
     const cartItem: ICartItem = {
       product: product,
@@ -136,12 +126,11 @@ export const ProductCard = ({ item }: Props) => {
               {item.price}
             </Text>
             <TouchableOpacity
-              onPress={() => handleAddToCart(item)}
-              // onPress={() =>
-              //   navigation.navigate("CustomTea", {
-              //     item: item,
-              //   })
-              // }
+              onPress={() =>
+                navigation.navigate("CustomizeItem", {
+                  store: item,
+                })
+              }
             >
               <WithLocalSvg
                 asset={require("./../../../assets/icons/cartBtn.svg")}

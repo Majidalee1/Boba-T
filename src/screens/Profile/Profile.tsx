@@ -186,7 +186,7 @@ export const Profile = ({ navigation, route }: Props) => {
           />
         </View>
         <View style={styles.inputView}>
-          <Text style={styles.label}>Phone</Text>
+          <Text style={styles.label}>Date of birth</Text>
           <TouchableOpacity
             style={styles.dateInput}
             onPress={() => setShow(true)}
