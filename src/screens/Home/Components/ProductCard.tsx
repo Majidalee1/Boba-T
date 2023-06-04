@@ -2,38 +2,77 @@ import React from "react";
 import { Image, Text, Pressable, View, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { WithLocalSvg } from "react-native-svg";
-import { Icon } from "@rneui/base";
 import { colors } from "../../../styles/colors";
-import { DeviceWidth, spacing } from "../../../utils/Layouts";
-import { ICartItem, IProduct } from "../../../utils/Models";
+import { DeviceWidth } from "../../../utils/Layouts";
+import { ICart, ICartItem, IProduct } from "../../../utils/Models";
 import { AppStackParamList } from "../../../navigation/AppNavigator";
-import { NavigationProp, RouteProp } from "@react-navigation/native";
+import { NavigationProp } from "@react-navigation/native";
 import { RowContainer } from "../../../components/RowContainer";
-import AsyncStorageService from "../../../services/Storage";
 import { fonts } from "../../../styles/fonts";
+import { FireStoreService } from "../../../services/FireStore";
+import { DeviceId, FirestoreCollections } from "../../../utils/constants";
+import { Timestamp } from "firebase/firestore";
+import { useToast } from "react-native-toast-notifications";
 
 interface Props {
   item: IProduct;
 }
 
 export const ProductCard = ({ item }: Props) => {
-  const navigation = useNavigation();
+  const toast = useToast();
+  const cartService = new FireStoreService<ICart>(FirestoreCollections.Carts);
+  const navigation = useNavigation<NavigationProp<AppStackParamList>>();
+
+  // creat the cart if not exist
+  const createCart = async () => {
+    const deviceId = await DeviceId();
+    const cart: ICart = {
+      id: deviceId,
+      storeId: item.store,
+      deviceId: deviceId,
+      createdAt: Timestamp.now().toDate(),
+    };
+    return await cartService.create(cart);
+  };
+
   const handleAddToCart = async (product: IProduct) => {
-    const cartItems: ICartItem[] | null = await AsyncStorageService.getItem(
-      "cart"
-    );
-    if (cartItems) {
-      await AsyncStorageService.setItem("cart", [...cartItems, product]);
-      if (!cartItems.includes(product)) {
-        await AsyncStorageService.setItem("cart", [...cartItems, product]);
-      }
-    } else {
-      await AsyncStorageService.setItem("cart", [product]);
+    const deviceId = await DeviceId();
+    let cart = await cartService.getById(deviceId);
+    if (!cart) {
+      await createCart();
+      cart = await cartService.getById(deviceId);
     }
+    console.log("cart", cart);
+    const cartItem: ICartItem = {
+      product: product,
+      quantity: 1,
+      price: product.price,
+    };
+    console.log("cartItem", cartItem);
+    const items = await cartService.createInSubCollection<ICartItem>(
+      cart?.Id,
+      FirestoreCollections.CartItems,
+      cartItem
+    );
+    toast.show("added successfully", {
+      type: "success",
+      placement: "bottom",
+      duration: 2000,
+      offset: 30,
+      animationType: "zoom-in",
+    });
+    console.log("items", items);
   };
 
   return (
-    <Pressable key={item.id} onPress={() => navigation.navigate("Details")}>
+    <Pressable
+      key={item.id}
+      onPress={() =>
+        navigation.navigate("Details", {
+          item: item,
+        })
+      }
+    >
       <View
         style={{
           alignItems: "flex-start",
@@ -50,7 +89,7 @@ export const ProductCard = ({ item }: Props) => {
       >
         <Image
           source={{
-            uri: "https://images.pexels.com/photos/90946/pexels-photo-90946.jpeg?cs=srgb&dl=pexels-math-90946.jpg&fm=jpg",
+            uri: item.image,
           }}
           style={{
             borderTopLeftRadius: 10,
@@ -83,8 +122,16 @@ export const ProductCard = ({ item }: Props) => {
                 fontFamily: fonts.bold,
                 color: colors.primary,
               }}
-            ></Text>
-            <TouchableOpacity onPress={() => handleAddToCart(item)}>
+            >
+              {item.price}
+            </Text>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("CustomizeItem", {
+                  store: item,
+                })
+              }
+            >
               <WithLocalSvg
                 asset={require("./../../../assets/icons/cartBtn.svg")}
               />

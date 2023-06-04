@@ -6,6 +6,10 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AppNavigator } from "./src/navigation/AppNavigator";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ToastProvider } from "react-native-toast-notifications";
+
+// generate a random uuid
 
 SplashScreen.preventAutoHideAsync();
 
@@ -19,6 +23,8 @@ const theme = createTheme({
     primary: "#fbfcff",
   },
 });
+
+// get or set the divice id
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -38,10 +44,12 @@ export default function App() {
     return null;
   }
   return (
-    <SafeAreaProvider onLayout={onLayoutRootView}>
-      <ThemeProvider theme={theme}>
-        <AppNavigator />
-      </ThemeProvider>
-    </SafeAreaProvider>
+    <ToastProvider>
+      <SafeAreaProvider onLayout={onLayoutRootView}>
+        <ThemeProvider theme={theme}>
+          <AppNavigator />
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </ToastProvider>
   );
 }

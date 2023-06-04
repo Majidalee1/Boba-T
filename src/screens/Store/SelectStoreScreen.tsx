@@ -1,5 +1,5 @@
 import { NavigationProp, RouteProp } from "@react-navigation/native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FlatList,
   StatusBar,
@@ -18,6 +18,10 @@ import { useFireStore } from "../../utils/Hooks";
 import { DeviceHeight, spacing } from "../../utils/Layouts";
 import { IStore } from "../../utils/Models";
 import { StoreCard } from "./components/StoreItem";
+import { DeviceId } from "../../utils/constants";
+import { FireStoreService } from "../../services/FireStore";
+import { IUser } from "../../utils/Models";
+import { FirestoreCollections } from "../../utils/constants";
 
 const $container: ViewStyle = {
   flex: 1,
@@ -38,10 +42,25 @@ interface Props {
 
 export const Stores = (props: Props) => {
   const { navigation } = props;
+  const usersService = new FireStoreService<IUser>(FirestoreCollections.Users);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [stores, setStores] = useFireStore<IStore>("stores");
+  const [stores, setStores] = useFireStore<IStore>("Stores");
+  const [name, setName] = useState<string>("");
 
   console.log("stores", stores);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      (async () => {
+        const deviceId = await DeviceId();
+        const user = await usersService.getById(deviceId);
+        if (user) {
+          setName(user.name);
+        }
+      })();
+    });
+    return unsubscribe;
+  });
 
   return (
     <View style={$container}>
@@ -60,7 +79,7 @@ export const Stores = (props: Props) => {
           height: DeviceHeight * 0.2,
         }}
       >
-        <Text style={styles.greetingMessage}>Hello John!</Text>
+        <Text style={styles.greetingMessage}>Hello {name}!</Text>
         <Text style={styles.heading}>
           Choose A shop To Order your Bubble Tea
         </Text>
@@ -79,7 +98,7 @@ export const Stores = (props: Props) => {
           >
             <StoreCard
               title={item.name}
-              address={item.address}
+              address={item.location}
               icon={item.icon}
               isSelected={index === selectedIndex}
             />

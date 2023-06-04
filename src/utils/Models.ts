@@ -2,10 +2,10 @@ import { faker } from "@faker-js/faker";
 import { FireStoreService } from "../services/FireStore";
 export interface IStore {
   id: string;
-  name: string;
   icon: string;
   address: string;
   description: string;
+  name: string;
 }
 
 export const GenerateStores = (count: number = 10): IStore[] => {
@@ -40,8 +40,16 @@ export interface IProduct {
   category: string;
   image: string;
   description: string;
-  store: string;
+  storeID: string;
 }
+export interface IBanner {
+  id?: string;
+  title: string;
+  image: string;
+  description: string;
+}
+
+
 export const GenerateProducts = (
   store_id: string,
   count: number = 10

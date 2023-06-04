@@ -1,81 +1,107 @@
 import React from "react";
-import {
-  FlatList,
-  Pressable,
-  ScrollView,
-  TouchableOpacity,
-  View,
-  Text,
-  StatusBar,
-} from "react-native";
+import { FlatList, View, Text, StatusBar } from "react-native";
 import { AppStackParamList, TabParamList } from "../../navigation/AppNavigator";
 import { NavigationProp, RouteProp } from "@react-navigation/native";
-import {
-  Avatar,
-  // Button,
-  Dialog,
-  Icon,
-  Input,
-  ListItem,
-  Switch,
-} from "@rneui/themed";
 import { colors } from "./../../styles/colors";
-import { DeviceHeight, DeviceWidth, spacing } from "../../utils/Layouts";
 import { Button } from "../../components/Button";
 import { fonts } from "../../styles/fonts";
 
-import { GenerateCartItems, ICartItem, createOrder } from "../../utils/Models";
+import { ICart, ICartItem, createOrder } from "../../utils/Models";
 import { CartItem } from "./components/CartItem";
 import { useEffect, useState } from "react";
-import QRCode from "react-native-qrcode-svg";
 import { faker } from "@faker-js/faker";
-import { RowContainer } from "../../components/RowContainer";
 import AsyncStorageService from "../../services/Storage";
+import { FireStoreService } from "../../services/FireStore";
+import { DeviceId, FirestoreCollections } from "../../utils/constants";
+import { useToast } from "react-native-toast-notifications";
 
 export interface Props {
   navigation: NavigationProp<AppStackParamList>;
   route: RouteProp<TabParamList, "Cart">;
 }
 export const CartScreen = ({ navigation, route }: Props) => {
-  const [isDialogVisible, setIsDialogVisible] = useState<boolean>(false);
-
-  // get cart items from storage
+  const toast = useToast();
+  const cartService = new FireStoreService<ICart>(FirestoreCollections.Carts);
   const [CartItems, setCartItems] = useState<ICartItem[]>([]);
+  const [totalPrice, setTotalPrice] = useState<string>("0");
+
   async function getCartItems() {
-    // AsyncStorageService.clear();
-    const cartItems = await AsyncStorageService.getItem("cart");
-    console.log(cartItems);
-    setCartItems(cartItems ? cartItems : []);
+    const deviceId = await DeviceId();
+    console.log(deviceId);
+    const cart = await cartService.getById(deviceId);
+    // console.log("==>>>>cart", cart);
+    if (cart) {
+      const cartItems = await cartService.getSubCollection<ICartItem>(
+        cart?.Id,
+        FirestoreCollections.CartItems
+      );
+      let total = 0;
+      cartItems?.forEach((element) => {
+        total = total + Number(element.price);
+      });
+      setTotalPrice(total.toString());
+      // console.log("====cartItems===", cartItems);
+      setCartItems(cartItems || []);
+    }
   }
 
   const removeCartItem = async (id: string) => {
-    const newCartItems = CartItems.filter((item) => item.id !== id);
-    await AsyncStorageService.setItem("cart", newCartItems);
-    setCartItems(newCartItems);
+    const deviceId = await DeviceId();
+    const cart = await cartService.getById(deviceId);
+    await cartService.deleteFromSubCollection(
+      cart?.Id,
+      FirestoreCollections.CartItems,
+      id
+    );
+    toast.show("item removed successfully", {
+      type: "success",
+      placement: "bottom",
+      duration: 2000,
+      offset: 30,
+      animationType: "zoom-in",
+    });
+    getCartItems();
   };
 
   // on checkout generate order number
 
   const handleCheckout = async () => {
+    const deviceId = await DeviceId();
     const order_number = faker.random.alphaNumeric(6);
+    let total = 0;
+    CartItems.forEach((element) => {
+      total = total + Number(element.price);
+    });
+    console.log(total);
     const oderCreated = await createOrder({
       order_number,
       items: CartItems,
-      total: "17.54",
+      total: total.toString(),
       status: "pending",
+      createdAt: new Date().toString(),
+      orderType: "notCustom",
     });
 
-    console.log(oderCreated);
+    // console.log(oderCreated);
 
     if (oderCreated) {
-      await AsyncStorageService.clear();
+      await cartService.delete(deviceId);
+      // await AsyncStorageService.clear();
       setCartItems([]);
-      navigation.navigate("Checkout", { order_number });
+      navigation.navigate("Checkout", {
+        order_number,
+        items: CartItems,
+        total: total.toString(),
+        status: "pending",
+      });
     }
   };
 
   useEffect(() => {
-    getCartItems();
+    const unsubscribe = navigation.addListener("focus", () => {
+      getCartItems();
+    });
+    return unsubscribe;
   }, []);
 
   return (
@@ -97,31 +123,52 @@ export const CartScreen = ({ navigation, route }: Props) => {
         Cart Items ({CartItems.length})
       </Text>
       <FlatList
-        // style={{ maxHeight: DeviceHeight * 0.8 }}
         data={CartItems}
         scrollEnabled={true}
         keyExtractor={(item) => item.id!}
         renderItem={({ item, index, separators }) => (
           <CartItem
             id={item.id}
-            name={item.name}
+            product={item.product}
             price={item.price}
             quantity={item.quantity}
-            total={item.total}
             removeCartItem={removeCartItem}
           />
         )}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 20 }}
+        ListEmptyComponent={() => (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              height: 300,
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: fonts.regular,
+                color: colors.text_primary,
+                fontSize: 14,
+              }}
+            >
+              There are no items
+            </Text>
+          </View>
+        )}
       />
 
       {/* checkout button */}
-      <View style={{ marginBottom: 20 }}>
-        <Button
-          title={"Proceed to Checkout $17.54"}
-          onPress={() => handleCheckout()}
-        />
-      </View>
+      {CartItems.length !== 0 && (
+        <View style={{ marginBottom: 20 }}>
+          <Button
+            title={`Proceed to Checkout $${totalPrice}`}
+            onPress={() => handleCheckout()}
+          />
+        </View>
+      )}
+
       <StatusBar translucent={false} backgroundColor="#FBFCFF" />
     </View>
   );

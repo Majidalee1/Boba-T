@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   Text,
@@ -13,19 +13,93 @@ import { NavigationProp, RouteProp } from "@react-navigation/native";
 import { Entypo } from "@expo/vector-icons";
 import { AppStackParamList } from "../../navigation/AppNavigator";
 import { WithLocalSvg } from "react-native-svg";
-import { FontAwesome } from "@expo/vector-icons";
 import QRCode from "react-native-qrcode-svg";
 import { Button } from "../../components/Button";
 import { colors } from "../../styles/colors";
 import { fonts } from "../../styles/fonts";
+import { captureRef } from "react-native-view-shot";
+import * as MediaLibrary from "expo-media-library";
+import { useToast } from "react-native-toast-notifications";
+import * as Clipboard from "expo-clipboard";
+import { shareAsync } from "expo-sharing";
 
 interface Props {
   navigation: NavigationProp<AppStackParamList>;
   route: RouteProp<AppStackParamList, "Checkout">;
 }
 export const Checkout = ({ navigation, route }: Props) => {
+  const imageRef = useRef();
+  const toast = useToast();
   const order_number = route.params.order_number as string;
-  console.log({ order_number });
+  // const total = route.params.total as string;
+  // const status = route.params.status as string;
+  // const items = route.params.status as any;
+  const [orderNumber, setOrderNumber] = useState<string>(order_number);
+  const [status, requestPermission] = MediaLibrary.usePermissions();
+  // ...rest of the code remains same
+
+  if (status === null) {
+    requestPermission();
+  }
+  // console.log({ order_number });
+
+  const onSaveImageAsync = async () => {
+    try {
+      const localUri = await captureRef(imageRef, {
+        height: 440,
+        quality: 1,
+      });
+      await MediaLibrary.saveToLibraryAsync(localUri);
+      if (localUri) {
+        toast.show("Saved", {
+          type: "normal",
+          placement: "bottom",
+          duration: 2000,
+          offset: 30,
+          animationType: "zoom-in",
+        });
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const onShareImageAsync = async () => {
+    try {
+      const localUri = await captureRef(imageRef, {
+        height: 440,
+        quality: 1,
+      });
+
+      await shareAsync(localUri, {
+        UTI: ".pdf",
+        mimeType: "application/pdf",
+      });
+      if (localUri) {
+        toast.show("Shared", {
+          type: "normal",
+          placement: "bottom",
+          duration: 2000,
+          offset: 30,
+          animationType: "zoom-in",
+        });
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const copyToClipboard = async () => {
+    await Clipboard.setStringAsync(orderNumber);
+    toast.show("saved to clipboard!", {
+      type: "normal",
+      placement: "bottom",
+      duration: 2000,
+      offset: 30,
+      animationType: "zoom-in",
+    });
+  };
+
+  // ...rest of the code remains same
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -42,14 +116,20 @@ export const Checkout = ({ navigation, route }: Props) => {
           Show this to counter & Receive your order
         </Text>
         <View
+          ref={imageRef}
+          collapsable={false}
           style={{
             justifyContent: "center",
             alignItems: "center",
             marginTop: 20,
+            paddingVertical: 20,
+            width: "90%",
+            alignSelf: "center",
+            backgroundColor: "#fff",
           }}
         >
           <QRCode
-            value={order_number}
+            value={orderNumber}
             color={colors.black}
             backgroundColor={colors.secondary}
             size={250}
@@ -64,8 +144,12 @@ export const Checkout = ({ navigation, route }: Props) => {
         >
           <Text style={styles.inputLabel}>Order no</Text>
           <View style={styles.inputView}>
-            <TextInput placeholder={order_number!} style={styles.input} />
-            <TouchableOpacity>
+            <TextInput
+              placeholder={orderNumber!}
+              style={styles.input}
+              onChangeText={(text) => setOrderNumber(text)}
+            />
+            <TouchableOpacity onPress={() => copyToClipboard()}>
               <WithLocalSvg asset={require("./../../assets/icons/copy.svg")} />
             </TouchableOpacity>
           </View>
@@ -78,7 +162,10 @@ export const Checkout = ({ navigation, route }: Props) => {
               margin: 15,
             }}
           >
-            <TouchableOpacity style={styles.downloadBtn}>
+            <TouchableOpacity
+              style={styles.downloadBtn}
+              onPress={() => onSaveImageAsync()}
+            >
               <WithLocalSvg
                 asset={require("./../../assets/icons/download.svg")}
               />
@@ -92,7 +179,10 @@ export const Checkout = ({ navigation, route }: Props) => {
               margin: 15,
             }}
           >
-            <TouchableOpacity style={styles.downloadBtn}>
+            <TouchableOpacity
+              style={styles.downloadBtn}
+              onPress={() => onShareImageAsync()}
+            >
               <WithLocalSvg asset={require("./../../assets/icons/send.svg")} />
             </TouchableOpacity>
             <Text style={styles.saveTxt}>Share</Text>
@@ -108,8 +198,6 @@ export const Checkout = ({ navigation, route }: Props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // alignItems: "center",
-    // justifyContent: "center",
     backgroundColor: "#FBFCFF",
   },
   text: {

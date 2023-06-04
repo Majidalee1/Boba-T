@@ -26,6 +26,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     borderRadius: 16,
     marginTop: 20,
+    marginBottom:10
   },
   buttonTxt: {
     color: colors.white,
