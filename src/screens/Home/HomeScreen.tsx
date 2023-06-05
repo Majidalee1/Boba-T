@@ -78,28 +78,23 @@ export const HomeScreen = ({ navigation, route }: Props) => {
 
   const _renderItem = (sliderValue:any) => {
     return (
-       <View style={styles.bannerCard}>
+       <ImageBackground source={{uri:sliderValue.item.image}} style={styles.bannerCard}>
         <View style={{ flex: 1 }}>
           <Text style={styles.bannerTxt}>
             {sliderValue?.item?.title}
           </Text>
 
-          <Text style={styles.bannerTxt}>
+          <Text style={[styles.bannerTxt,{fontFamily:"Poppins-Medium"}]}>
            {sliderValue?.item?.description}
           </Text>
-          <TouchableOpacity
-            style={styles.makeBtn}
-            onPress={() => navigation.navigate("CustomTea", { store: store })}
-          >
-            <Text style={styles.makeBtnTxt}>Make</Text>
-          </TouchableOpacity>
+          
         </View>
         <Image
           source={require("./../../assets/images/bubble-milk.png")}
           style={styles.storeImage}
           resizeMode="stretch"
         />
-      </View> 
+      </ImageBackground> 
     );
   };
 
@@ -131,6 +126,30 @@ export const HomeScreen = ({ navigation, route }: Props) => {
           </Text>
         </TouchableOpacity>
       </View>
+        <View
+          style={{
+          flexDirection: "row",
+          alignItems: "center",
+            justifyContent:"space-between"
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 15,
+              color: colors.primary,
+            fontFamily: fonts.medium,
+              lineHeight:25
+            }}
+          >
+            Make your own customizable tea?
+        </Text>
+        <TouchableOpacity
+            style={styles.makeBtn}
+            onPress={() => navigation.navigate("CustomTea", { store: store })}
+          >
+            <Text style={styles.makeBtnTxt}>Make</Text>
+          </TouchableOpacity>
+        </View>
       <View style={{justifyContent:"center",alignItems:"center"}}>
 
        <Carousel
@@ -188,16 +207,19 @@ const styles = StyleSheet.create({
     backgroundColor: colors.secondary,
   },
   makeBtn: {
-    width: 91,
-    height: 30,
+    // width: 91,
+    height: 25,
     backgroundColor: colors.white,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 10,
-    borderRadius: 6,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    paddingHorizontal:10
+    // elevation:1
   },
   makeBtnTxt: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: fonts.medium,
     color: colors.primary,
   },
@@ -207,18 +229,31 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "center",
-    padding: 20,
+    padding: 10,
     marginTop: 20,
     borderRadius: 10,
+    overflow: "hidden",
+    borderWidth: 2,
+    borderColor:colors.primary
   },
   storeImage: {
-    height: 130,
-    width: 100,
+    height: 70,
+    width: 60,
+    position: "absolute",
+    top: 0,
+    right:0
   },
   bannerTxt: {
     fontSize: 16,
     fontFamily: fonts.semiBold,
+    // backgroundColor: "#ffffff87",
+    backgroundColor:"#4fb8e9eb",
     color: colors.white,
+    alignSelf: "flex-start",
+    marginVertical: 4,
+    borderRadius: 5,
+    paddingHorizontal:5
+
   },
     sliderContainer: {
     backgroundColor: '#1E2329',
