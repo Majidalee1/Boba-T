@@ -15,7 +15,9 @@ export const CartItem = ({
   product,
   price,
   quantity,
+  index,
   removeCartItem,
+  increament,
 }: ICartItem & { removeCartItem: (id: string) => void }) => {
   const [itemCount, setItemCount] = useState<number>(quantity || 0);
   const [item, setItem] = useState(0);
@@ -74,8 +76,9 @@ export const CartItem = ({
         >
           <View style={styles.itemsBtns}>
             <TouchableOpacity
-              disabled={item === 0}
-              onPress={() => setItemCount(item - 1)}
+              disabled={quantity == 1}
+              onPress={() => increament("decrease", index)}
+              // onPress={() => setItemCount(item - 1)}
             >
               <AntDesign
                 name="minus"
@@ -90,9 +93,9 @@ export const CartItem = ({
                 fontSize: 14,
               }}
             >
-              {itemCount}
+              {quantity}
             </Text>
-            <TouchableOpacity onPress={() => setItemCount(item + 1)}>
+            <TouchableOpacity onPress={() => increament("increase", index)}>
               <AntDesign name="plus" size={15} color={colors.text_primary} />
             </TouchableOpacity>
           </View>

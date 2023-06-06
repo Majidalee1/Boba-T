@@ -45,6 +45,8 @@ export const CartScreen = ({ navigation, route }: Props) => {
     }
   }
 
+  useEffect(() => {}, [CartItems]);
+
   const removeCartItem = async (id: string) => {
     const deviceId = await DeviceId();
     const cart = await cartService.getById(deviceId);
@@ -97,6 +99,25 @@ export const CartScreen = ({ navigation, route }: Props) => {
     }
   };
 
+  const increament = (type: string, index: number) => {
+    var actualPrice =
+      Number(CartItems[index].price) / Number(CartItems[index].quantity);
+    if (type === "increase") {
+      CartItems[index].quantity = Number(CartItems[index].quantity) + 1;
+    } else {
+      CartItems[index].quantity = Number(CartItems[index].quantity) - 1;
+    }
+    CartItems[index].price = (
+      actualPrice * Number(CartItems[index].quantity)
+    ).toString();
+    let total = 0;
+    CartItems.forEach((element) => {
+      total = total + Number(element.price);
+    });
+    setTotalPrice(total.toString());
+    setCartItems([...CartItems]);
+  };
+
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
       getCartItems();
@@ -133,6 +154,8 @@ export const CartScreen = ({ navigation, route }: Props) => {
             price={item.price}
             quantity={item.quantity}
             removeCartItem={removeCartItem}
+            index={index}
+            increament={increament}
           />
         )}
         showsVerticalScrollIndicator={false}

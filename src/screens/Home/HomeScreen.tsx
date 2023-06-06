@@ -86,7 +86,7 @@ export const HomeScreen = ({ navigation, route }: Props) => {
           source={{ uri: sliderValue.image }}
           style={styles.bannerCard}
         >
-          <View style={{ flex: 1 }}>
+          <View style={{ width: "100%" }}>
             <Text style={styles.bannerTxt}>{sliderValue?.title}</Text>
             <Text style={[styles.bannerTxt, { fontFamily: "Poppins-Medium" }]}>
               {sliderValue?.description}
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
   },
   bannerCard: {
     height: 137,
-    backgroundColor: colors.primary,
+    // backgroundColor: colors.primary,
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "center",
@@ -235,14 +235,14 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     borderWidth: 2,
     borderColor: colors.primary,
-    width: "90%",
+    width: screenWidth - 50,
   },
   storeImage: {
-    height: 70,
-    width: 60,
+    height: 40,
+    width: 40,
     position: "absolute",
     top: 0,
-    right: 0,
+    right: 10,
   },
   bannerTxt: {
     fontSize: 16,
