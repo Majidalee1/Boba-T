@@ -29,7 +29,7 @@ import { useToast } from "react-native-toast-notifications";
 import { FireStoreService } from "../../services/FireStore";
 import { Timestamp } from "firebase/firestore";
 import { Button } from "@rneui/base";
-import { createOrder, createCustomOrder } from "../../utils/Models";
+import { createOrder, createCustomOrder,IOrder } from "../../utils/Models";
 import { faker } from "@faker-js/faker";
 
 export interface Props {
@@ -169,7 +169,7 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
 
   const handleCheckout = async () => {
     const order_number = faker.random.alphaNumeric(6);
-    const oderCreated = await createCustomOrder({
+    const oderCreated = await createOrder<IOrder>({
       order_number,
       product: {
         quantity: items,

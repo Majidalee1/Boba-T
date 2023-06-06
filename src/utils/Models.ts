@@ -90,10 +90,13 @@ export interface IOrder {
   total: string;
   items: ICartItem[];
   status: string;
+  product: any;
+  createdAt: any;
+  orderType:any
 }
 
 export const createOrder = async (payload: IOrder): Promise<IOrder> => {
-  const OrderService = new FireStoreService<IOrder>("orders");
+  const OrderService = new FireStoreService<IOrder>("Orders");
   return await OrderService.create(payload);
 };
 
