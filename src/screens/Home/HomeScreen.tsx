@@ -9,14 +9,14 @@ import {
   Text,
   Image,
   ImageBackground,
-  Dimensions
+  Dimensions,
 } from "react-native";
 import { Header } from "../../components/Header";
 import { RowContainer } from "../../components/RowContainer";
 import { AppStackParamList, TabParamList } from "../../navigation/AppNavigator";
 import { colors } from "../../styles/colors";
 import { spacing } from "../../utils/Layouts";
-import { IProduct, IStore,IBanner } from "../../utils/Models";
+import { IProduct, IStore, IBanner } from "../../utils/Models";
 import { CategoryList } from "./Components/CategoryList";
 import { LocationHeader } from "./Components/LocationHeader";
 import { ProductCard } from "./Components/ProductCard";
@@ -24,7 +24,7 @@ import { fonts } from "../../styles/fonts";
 import { useFireStoreWithFilter, useFireStoreById } from "../../utils/Hooks";
 import { FirestoreCollections } from "../../utils/constants";
 import { useFireStore } from "../../utils/Hooks";
-import Carousel from 'react-native-snap-carousel';
+import Carousel from "./Components/Carousal";
 
 const $container: ViewStyle = {
   flex: 1,
@@ -42,8 +42,8 @@ interface Props {
 }
 
 // a helper component named Row Container that get the children as props and render them in a row
-  const screens = Dimensions.get('window');
-const {width: screenWidth} = Dimensions.get('window');
+const screens = Dimensions.get("window");
+const { width: screenWidth } = Dimensions.get("window");
 export const HomeScreen = ({ navigation, route }: Props) => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const store_id = route.params.storeId;
@@ -70,43 +70,48 @@ export const HomeScreen = ({ navigation, route }: Props) => {
   }, [products]);
 
   const filteredProducts = products.filter((item) => {
-    return item.category.toLowerCase().includes(selectedCategory?.toLowerCase());
+    return item.category
+      .toLowerCase()
+      .includes(selectedCategory?.toLowerCase());
   });
-  // console.log("====filteredProducts====", filteredProducts);
 
-
-
-  const _renderItem = (sliderValue:any) => {
+  const _renderItem = (sliderValue: any) => {
     return (
-       <ImageBackground source={{uri:sliderValue.item.image}} style={styles.bannerCard}>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.bannerTxt}>
-            {sliderValue?.item?.title}
-          </Text>
-
-          <Text style={[styles.bannerTxt,{fontFamily:"Poppins-Medium"}]}>
-           {sliderValue?.item?.description}
-          </Text>
-          
-        </View>
-        <Image
-          source={require("./../../assets/images/bubble-milk.png")}
-          style={styles.storeImage}
-          resizeMode="stretch"
-        />
-      </ImageBackground> 
+      <View
+        style={{
+          width: screenWidth,
+        }}
+      >
+        <ImageBackground
+          source={{ uri: sliderValue.image }}
+          style={styles.bannerCard}
+        >
+          <View style={{ flex: 1 }}>
+            <Text style={styles.bannerTxt}>{sliderValue?.title}</Text>
+            <Text style={[styles.bannerTxt, { fontFamily: "Poppins-Medium" }]}>
+              {sliderValue?.description}
+            </Text>
+          </View>
+          <Image
+            source={require("./../../assets/images/bubble-milk.png")}
+            style={styles.storeImage}
+            resizeMode="stretch"
+          />
+        </ImageBackground>
+      </View>
     );
   };
 
-
   return (
     <View style={styles.container}>
-      <Header
-        actions={{
-          left: () => navigation.navigate("Store"),
-        }}
-      />
-      <View>
+      <View style={{ width: "90%", alignSelf: "center" }}>
+        <Header
+          actions={{
+            left: () => navigation.navigate("Store"),
+          }}
+        />
+      </View>
+      <View style={{ width: "90%", alignSelf: "center" }}>
         <LocationHeader navigation={navigation} name={store.name} />
         <TouchableOpacity
           style={{
@@ -126,48 +131,43 @@ export const HomeScreen = ({ navigation, route }: Props) => {
           </Text>
         </TouchableOpacity>
       </View>
-        <View
-          style={{
+      <View
+        style={{
           flexDirection: "row",
           alignItems: "center",
-            justifyContent:"space-between"
+          justifyContent: "space-between",
+          width: "90%",
+          alignSelf: "center",
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 15,
+            color: colors.primary,
+            fontFamily: fonts.medium,
+            lineHeight: 25,
           }}
         >
-          <Text
-            style={{
-              fontSize: 15,
-              color: colors.primary,
-            fontFamily: fonts.medium,
-              lineHeight:25
-            }}
-          >
-            Make your own customizable tea?
+          Make your own customizable tea?
         </Text>
         <TouchableOpacity
-            style={styles.makeBtn}
-            onPress={() => navigation.navigate("CustomTea", { store: store })}
-          >
-            <Text style={styles.makeBtnTxt}>Make</Text>
-          </TouchableOpacity>
-        </View>
-      <View style={{justifyContent:"center",alignItems:"center"}}>
+          style={styles.makeBtn}
+          onPress={() => navigation.navigate("CustomTea", { store: store })}
+        >
+          <Text style={styles.makeBtnTxt}>Make</Text>
+        </TouchableOpacity>
+      </View>
 
-       <Carousel
-          sliderWidth={screenWidth}
-          sliderHeight={screenWidth}
-          itemWidth={screenWidth-30}
-          data={banners}
-          renderItem={_renderItem}
-          autoplay={true}
-          loop={true}
-          />
-          </View>
+      <Carousel data={banners} renderItem={_renderItem} />
+
       <Text
         style={{
           fontSize: 16,
           color: "#1C1E23",
           fontFamily: fonts.semiBold,
           marginTop: 20,
+          width: "90%",
+          alignSelf: "center",
         }}
       >
         Tea Category
@@ -176,6 +176,7 @@ export const HomeScreen = ({ navigation, route }: Props) => {
         <RowContainer
           styles={{
             marginVertical: 10,
+            paddingHorizontal: "5%",
           }}
         >
           <CategoryList
@@ -195,7 +196,7 @@ export const HomeScreen = ({ navigation, route }: Props) => {
         keyExtractor={(item) => item.id!}
         numColumns={2}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}
+        contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: "5%" }}
       />
     </View>
   );
@@ -203,7 +204,7 @@ export const HomeScreen = ({ navigation, route }: Props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: spacing.large,
+    // paddingHorizontal: spacing.large,
     backgroundColor: colors.secondary,
   },
   makeBtn: {
@@ -215,7 +216,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: colors.primary,
-    paddingHorizontal:10
+    paddingHorizontal: 10,
     // elevation:1
   },
   makeBtnTxt: {
@@ -230,74 +231,73 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "center",
     padding: 10,
-    marginTop: 20,
     borderRadius: 10,
     overflow: "hidden",
     borderWidth: 2,
-    borderColor:colors.primary
+    borderColor: colors.primary,
+    width: "90%",
   },
   storeImage: {
     height: 70,
     width: 60,
     position: "absolute",
     top: 0,
-    right:0
+    right: 0,
   },
   bannerTxt: {
     fontSize: 16,
     fontFamily: fonts.semiBold,
     // backgroundColor: "#ffffff87",
-    backgroundColor:"#4fb8e9eb",
+    backgroundColor: "#4fb8e9eb",
     color: colors.white,
     alignSelf: "flex-start",
     marginVertical: 4,
     borderRadius: 5,
-    paddingHorizontal:5
-
+    paddingHorizontal: 5,
   },
-    sliderContainer: {
-    backgroundColor: '#1E2329',
+  sliderContainer: {
+    backgroundColor: "#1E2329",
     width: screens.width * 0.898,
     height: 139,
     borderRadius: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingLeft: 20,
     paddingRight: 0,
     paddingVertical: 10,
   },
   sliderName: {
-    color: '#F69223',
+    color: "#F69223",
     fontSize: 20,
     lineHeight: 27,
-    fontWeight: '700',
-    fontStyle: 'normal',
-    fontFamily: 'OpenSans-Regular',
+    fontWeight: "700",
+    fontStyle: "normal",
+    fontFamily: "OpenSans-Regular",
     marginTop: 0,
   },
   sliderHeading: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 20,
     lineHeight: 27,
-    fontWeight: '700',
-    fontStyle: 'normal',
-    fontFamily: 'OpenSans-Regular',
+    fontWeight: "700",
+    fontStyle: "normal",
+    fontFamily: "OpenSans-Regular",
     marginTop: 10,
   },
   sliderSubHeading: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 14,
     lineHeight: 19,
-    fontWeight: '400',
-    fontStyle: 'normal',
-    fontFamily: 'OpenSans-Regular',
+    fontWeight: "400",
+    fontStyle: "normal",
+    fontFamily: "OpenSans-Regular",
     marginTop: 3,
   },
   dotMain: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    position: 'absolute',
+    flexDirection: "row",
+    alignItems: "center",
+    position: "absolute",
     bottom: 20,
     right: 40,
   },
@@ -305,14 +305,14 @@ const styles = StyleSheet.create({
     width: 9,
     height: 9,
     borderRadius: 9 / 2,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     marginHorizontal: 4,
   },
   activeDot: {
     width: 9,
     height: 9,
     borderRadius: 9 / 2,
-    backgroundColor: '#F69223',
+    backgroundColor: "#F69223",
     marginHorizontal: 4,
   },
 });

@@ -49,7 +49,6 @@ export interface IBanner {
   description: string;
 }
 
-
 export const GenerateProducts = (
   store_id: string,
   count: number = 10
@@ -78,7 +77,7 @@ export const CreateProducts = async (
 export interface ICartItem {
   id?: string;
   name: string;
-  product_id?: string;
+  product: object;
   price: string;
   quantity?: number;
   total?: string;

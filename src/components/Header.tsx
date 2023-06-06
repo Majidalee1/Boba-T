@@ -35,7 +35,11 @@ export const Header = (props?: Props) => (
     //   }}
     //   onPress={() => props?.actions?.right?.()} />}
     // {...props}
-    style={{ width: "100%", marginTop: 10, marginBottom: 20 }}
+    style={{
+      width: "100%",
+      marginTop: 10,
+      marginBottom: 20,
+    }}
   >
     <TouchableOpacity
       onPress={() => props?.actions?.left?.()}

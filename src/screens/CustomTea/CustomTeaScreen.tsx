@@ -145,6 +145,7 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
         sugar: sugars[sugarIndex],
         milk: milks[milkIndex],
         topping: toppings[toppingIndex],
+        jelly: jellies[jellyIndex],
         name: "Pre made drink",
         image:
           "https://firebasestorage.googleapis.com/v0/b/bubble-tea-f3d52.appspot.com/o/images%2Fbubble-milk-tea-pearl-milk-tea-png%20copya%201.png?alt=media&token=12cfce12-e8b6-42b4-8390-169ad6788095&_gl=1*t8qeer*_ga*NTY5NjcyMzQxLjE2NjcyOTg2NDI.*_ga_CW55HF8NVT*MTY4NTYwNzUxNC4yOS4xLjE2ODU2MDc2MDIuMC4wLjA.",
