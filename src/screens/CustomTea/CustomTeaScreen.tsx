@@ -7,7 +7,7 @@ import { ButtonGroup } from "@rneui/themed";
 import { useFireStoreCreate } from "../../utils/Hooks";
 import { createCart } from "../../utils/Models";
 import { FirestoreCollections } from "../../utils/constants";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ScrollView,
   View,
@@ -41,6 +41,7 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
   const { store } = route.params;
   const toast = useToast();
   const cartService = new FireStoreService<ICart>(FirestoreCollections.Carts);
+  const [ingredients, setIngredients] = useState([]);
   const [sizeIndex, setSizeIndex] = useState(0);
   const [iceIndex, setIceIndex] = useState(0);
   const [sugarIndex, setSugarIndex] = useState(0);
@@ -113,6 +114,27 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
     setJellyIndex(selectedIndex);
   };
 
+  const handlePress = (i: number, index: number) => {
+    // console.log(index);
+    ingredients[index].selectedIndex = i;
+    setIngredients([...ingredients]);
+  };
+
+  useEffect(() => {
+    var filteredIngredients = store.Ingredients
+      ? store.Ingredients.filter(
+          (ingredient: any) => ingredient.type === "custom"
+        )
+      : [];
+    console.log(filteredIngredients);
+    setIngredients(
+      filteredIngredients.map((obj: any) => ({
+        ...obj,
+        selectedIndex: 0,
+      }))
+    );
+  }, []);
+
   // creat the cart if not exist
   const createCart = async () => {
     const deviceId = await DeviceId();
@@ -127,45 +149,45 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
     return await cartService.create(cart);
   };
 
-  const handleAddToCart = async () => {
-    const deviceId = await DeviceId();
-    let cart = await cartService.getById(deviceId);
-    if (!cart) {
-      await createCart();
-      cart = await cartService.getById(deviceId);
-    }
+  // const handleAddToCart = async () => {
+  //   const deviceId = await DeviceId();
+  //   let cart = await cartService.getById(deviceId);
+  //   if (!cart) {
+  //     await createCart();
+  //     cart = await cartService.getById(deviceId);
+  //   }
 
-    const cartItem: ICartItem = {
-      quantity: items,
-      price: (10 * items).toString(),
-      product: {
-        flavour: teas[teaIndex],
-        size: sizes[sizeIndex],
-        ice: ices[iceIndex],
-        sugar: sugars[sugarIndex],
-        milk: milks[milkIndex],
-        topping: toppings[toppingIndex],
-        jelly: jellies[jellyIndex],
-        name: "Pre made drink",
-        image:
-          "https://firebasestorage.googleapis.com/v0/b/bubble-tea-f3d52.appspot.com/o/images%2Fbubble-milk-tea-pearl-milk-tea-png%20copya%201.png?alt=media&token=12cfce12-e8b6-42b4-8390-169ad6788095&_gl=1*t8qeer*_ga*NTY5NjcyMzQxLjE2NjcyOTg2NDI.*_ga_CW55HF8NVT*MTY4NTYwNzUxNC4yOS4xLjE2ODU2MDc2MDIuMC4wLjA.",
-      },
-    };
+  //   const cartItem: ICartItem = {
+  //     quantity: items,
+  //     price: (10 * items).toString(),
+  //     product: {
+  //       flavour: teas[teaIndex],
+  //       size: sizes[sizeIndex],
+  //       ice: ices[iceIndex],
+  //       sugar: sugars[sugarIndex],
+  //       milk: milks[milkIndex],
+  //       topping: toppings[toppingIndex],
+  //       jelly: jellies[jellyIndex],
+  //       name: "Pre made drink",
+  //       image:
+  //         "https://firebasestorage.googleapis.com/v0/b/bubble-tea-f3d52.appspot.com/o/images%2Fbubble-milk-tea-pearl-milk-tea-png%20copya%201.png?alt=media&token=12cfce12-e8b6-42b4-8390-169ad6788095&_gl=1*t8qeer*_ga*NTY5NjcyMzQxLjE2NjcyOTg2NDI.*_ga_CW55HF8NVT*MTY4NTYwNzUxNC4yOS4xLjE2ODU2MDc2MDIuMC4wLjA.",
+  //     },
+  //   };
 
-    await cartService.createInSubCollection<ICartItem>(
-      cart?.Id,
-      FirestoreCollections.CartItems,
-      cartItem
-    );
-    toast.show("added to cart", {
-      type: "success",
-      placement: "bottom",
-      duration: 2000,
-      offset: 30,
-      animationType: "zoom-in",
-    });
-    navigation.navigate("Tabs", { screen: "Cart" });
-  };
+  //   await cartService.createInSubCollection<ICartItem>(
+  //     cart?.Id,
+  //     FirestoreCollections.CartItems,
+  //     cartItem
+  //   );
+  //   toast.show("added to cart", {
+  //     type: "success",
+  //     placement: "bottom",
+  //     duration: 2000,
+  //     offset: 30,
+  //     animationType: "zoom-in",
+  //   });
+  //   navigation.navigate("Tabs", { screen: "Cart" });
+  // };
 
   const handleCheckout = async () => {
     const order_number = faker.random.alphaNumeric(6);
@@ -232,48 +254,18 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
           showsVerticalScrollIndicator={false}
         >
           {/* flavours */}
-          <SelectionButtonGroup
-            selectedIndex={teaIndex}
-            title="Choose Flavour"
-            onPress={handleTeaPress}
-            buttons={teas}
-          />
-          <SelectionButtonGroup
-            selectedIndex={sizeIndex}
-            title="Choose Size"
-            onPress={handleSizePress}
-            buttons={sizes}
-          />
-          <SelectionButtonGroup
-            selectedIndex={iceIndex}
-            title="Choose Ice"
-            onPress={handleIcePress}
-            buttons={ices}
-          />
-          <SelectionButtonGroup
-            selectedIndex={sugarIndex}
-            title="Choose Sugar"
-            onPress={handleSugarPress}
-            buttons={sugars}
-          />
-          <SelectionButtonGroup
-            selectedIndex={milkIndex}
-            title="Choose Milk"
-            onPress={handleMilkPress}
-            buttons={milks}
-          />
-          <SelectionButtonGroup
-            selectedIndex={toppingIndex}
-            title="Topping"
-            onPress={handleToppingPress}
-            buttons={toppings}
-          />
-          <SelectionButtonGroup
-            selectedIndex={jellyIndex}
-            title="Jelly"
-            onPress={handleJellyPress}
-            buttons={jellies}
-          />
+          {ingredients.length !== 0 &&
+            ingredients.map((val: any, i: number) => {
+              return (
+                <SelectionButtonGroup
+                  selectedIndex={val.selectedIndex}
+                  title={val.name}
+                  onPress={handlePress}
+                  buttons={val.values}
+                  index={i}
+                />
+              );
+            })}
           <View style={{ width: "90%", alignSelf: "center" }}>
             <Text style={styles.itemLabel}>Item</Text>
             <View style={styles.itemsBtns}>
@@ -363,8 +355,9 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
 export const SelectionButtonGroup = (props: {
   selectedIndex: number;
   title: string;
-  onPress: (selectedIndex: number) => void;
+  onPress: (i: number, index: number) => void;
   buttons: string[];
+  index: number;
 }) => {
   return (
     <View style={{ paddingHorizontal: 10, paddingVertical: 5 }}>
@@ -385,11 +378,10 @@ export const SelectionButtonGroup = (props: {
         showsVerticalScrollIndicator={false}
       >
         <ButtonGroup
-          onPress={props.onPress}
+          onPress={(i) => props.onPress(i, props.index)}
           selectedIndex={props.selectedIndex}
           selectedButtonStyle={{
             backgroundColor: "#DBF4FF",
-            // borderColor: colors.primary,
             borderWidth: 0,
             height: 50,
             marginRight: 10,
