@@ -326,7 +326,7 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
               marginTop: 5,
             }}
           >
-            ${10 * items}
+            ${Number(store.price) * items}
           </Text>
         </View>
         <Button
@@ -434,7 +434,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   header: {
-    marginTop: 40,
+    marginTop: 20,
     width: "90%",
     alignSelf: "center",
     flexDirection: "row",

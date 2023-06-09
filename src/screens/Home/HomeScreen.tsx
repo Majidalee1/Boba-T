@@ -113,7 +113,7 @@ export const HomeScreen = ({ navigation, route }: Props) => {
       </View>
       <View style={{ width: "90%", alignSelf: "center" }}>
         <LocationHeader navigation={navigation} name={store.name} />
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={{
             flexDirection: "row",
             marginTop: 10,
@@ -129,7 +129,7 @@ export const HomeScreen = ({ navigation, route }: Props) => {
           >
             Find the best Tea for you
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
       <View
         style={{
@@ -138,6 +138,7 @@ export const HomeScreen = ({ navigation, route }: Props) => {
           justifyContent: "space-between",
           width: "90%",
           alignSelf: "center",
+          marginTop: 10,
         }}
       >
         <Text
