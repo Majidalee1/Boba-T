@@ -29,7 +29,7 @@ import { useToast } from "react-native-toast-notifications";
 import { FireStoreService } from "../../services/FireStore";
 import { Timestamp } from "firebase/firestore";
 import { Button } from "@rneui/base";
-import { createOrder, createCustomOrder,IOrder } from "../../utils/Models";
+import { createOrder, createCustomOrder, IOrder } from "../../utils/Models";
 import { faker } from "@faker-js/faker";
 
 export interface Props {
@@ -149,75 +149,72 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
     return await cartService.create(cart);
   };
 
-  // const handleAddToCart = async () => {
-  //   const deviceId = await DeviceId();
-  //   let cart = await cartService.getById(deviceId);
-  //   if (!cart) {
-  //     await createCart();
-  //     cart = await cartService.getById(deviceId);
-  //   }
-
-  //   const cartItem: ICartItem = {
-  //     quantity: items,
-  //     price: (10 * items).toString(),
-  //     product: {
-  //       flavour: teas[teaIndex],
-  //       size: sizes[sizeIndex],
-  //       ice: ices[iceIndex],
-  //       sugar: sugars[sugarIndex],
-  //       milk: milks[milkIndex],
-  //       topping: toppings[toppingIndex],
-  //       jelly: jellies[jellyIndex],
-  //       name: "Pre made drink",
-  //       image:
-  //         "https://firebasestorage.googleapis.com/v0/b/bubble-tea-f3d52.appspot.com/o/images%2Fbubble-milk-tea-pearl-milk-tea-png%20copya%201.png?alt=media&token=12cfce12-e8b6-42b4-8390-169ad6788095&_gl=1*t8qeer*_ga*NTY5NjcyMzQxLjE2NjcyOTg2NDI.*_ga_CW55HF8NVT*MTY4NTYwNzUxNC4yOS4xLjE2ODU2MDc2MDIuMC4wLjA.",
-  //     },
-  //   };
-
-  //   await cartService.createInSubCollection<ICartItem>(
-  //     cart?.Id,
-  //     FirestoreCollections.CartItems,
-  //     cartItem
-  //   );
-  //   toast.show("added to cart", {
-  //     type: "success",
-  //     placement: "bottom",
-  //     duration: 2000,
-  //     offset: 30,
-  //     animationType: "zoom-in",
-  //   });
-  //   navigation.navigate("Tabs", { screen: "Cart" });
-  // };
-
-  const handleCheckout = async () => {
-    const order_number = faker.random.alphaNumeric(6);
-    const oderCreated = await createOrder<IOrder>({
-      order_number,
-      product: {
-        quantity: items,
-        flavour: teas[teaIndex],
-        size: sizes[sizeIndex],
-        ice: ices[iceIndex],
-        sugar: sugars[sugarIndex],
-        milk: milks[milkIndex],
-        topping: toppings[toppingIndex],
-        name: "Pre made drink",
-        price: (10 * items).toString(),
-        image:
-          "https://firebasestorage.googleapis.com/v0/b/bubble-tea-f3d52.appspot.com/o/images%2Fbubble-milk-tea-pearl-milk-tea-png%20copya%201.png?alt=media&token=12cfce12-e8b6-42b4-8390-169ad6788095&_gl=1*t8qeer*_ga*NTY5NjcyMzQxLjE2NjcyOTg2NDI.*_ga_CW55HF8NVT*MTY4NTYwNzUxNC4yOS4xLjE2ODU2MDc2MDIuMC4wLjA.",
-      },
-      total: (10 * items).toString(),
-      status: "pending",
-      createdAt: new Date().toString(),
-      orderType: "custom",
-    });
-
-    if (oderCreated) {
-      navigation.navigate("Checkout", {
-        order_number: order_number,
-      });
+  const handleAddToCart = async () => {
+    const deviceId = await DeviceId();
+    let cart = await cartService.getById(deviceId);
+    if (!cart) {
+      await createCart();
+      cart = await cartService.getById(deviceId);
     }
+
+    var product = {};
+    ingredients.map((val, i) => {
+      product[val.name] = val.values[val.selectedIndex];
+    });
+    product.name = "Pre made drink";
+    product.image =
+      "https://firebasestorage.googleapis.com/v0/b/bubble-tea-f3d52.appspot.com/o/images%2Fbubble-milk-tea-pearl-milk-tea-png%20copya%201.png?alt=media&token=12cfce12-e8b6-42b4-8390-169ad6788095&_gl=1*t8qeer*_ga*NTY5NjcyMzQxLjE2NjcyOTg2NDI.*_ga_CW55HF8NVT*MTY4NTYwNzUxNC4yOS4xLjE2ODU2MDc2MDIuMC4wLjA.";
+
+    console.log(product);
+    const cartItem: ICartItem = {
+      quantity: items,
+      price: (10 * items).toString(),
+      product: product,
+      itemType: "custom",
+    };
+
+    await cartService.createInSubCollection<ICartItem>(
+      cart?.Id,
+      FirestoreCollections.CartItems,
+      cartItem
+    );
+    toast.show("added to cart", {
+      type: "success",
+      placement: "bottom",
+      duration: 2000,
+      offset: 30,
+      animationType: "zoom-in",
+    });
+    navigation.navigate("Tabs", { screen: "Cart" });
   };
+
+  // const handleCheckout = async () => {
+  //   const order_number = faker.random.alphaNumeric(6);
+  //   var product = {};
+  //   ingredients.map((val, i) => {
+  //     product[val.name] = val.values[val.selectedIndex];
+  //   });
+  //   product.name = "Pre made drink";
+  //   product.price = (10 * items).toString();
+  //   product.image =
+  //     "https://firebasestorage.googleapis.com/v0/b/bubble-tea-f3d52.appspot.com/o/images%2Fbubble-milk-tea-pearl-milk-tea-png%20copya%201.png?alt=media&token=12cfce12-e8b6-42b4-8390-169ad6788095&_gl=1*t8qeer*_ga*NTY5NjcyMzQxLjE2NjcyOTg2NDI.*_ga_CW55HF8NVT*MTY4NTYwNzUxNC4yOS4xLjE2ODU2MDc2MDIuMC4wLjA.";
+
+  //   console.log(product);
+  //   const oderCreated = await createOrder<IOrder>({
+  //     order_number,
+  //     product,
+  //     total: (10 * items).toString(),
+  //     status: "pending",
+  //     createdAt: new Date().toString(),
+  //     orderType: "custom",
+  //   });
+
+  //   if (oderCreated) {
+  //     navigation.navigate("Checkout", {
+  //       order_number: order_number,
+  //     });
+  //   }
+  // };
 
   return (
     <View
@@ -263,6 +260,7 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
                   onPress={handlePress}
                   buttons={val.values}
                   index={i}
+                  key={i}
                 />
               );
             })}
@@ -332,7 +330,7 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
           </Text>
         </View>
         <Button
-          title="Place Order"
+          title="Add to cart"
           buttonStyle={{
             backgroundColor: colors.primary,
             borderRadius: 16,
@@ -344,10 +342,14 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
             fontSize: 14,
             fontFamily: fonts.semiBold,
           }}
-          onPress={() => handleCheckout()}
+          onPress={() => handleAddToCart()}
         />
       </View>
-      <StatusBar backgroundColor={colors.primary} barStyle="light-content" />
+      <StatusBar
+        translucent={false}
+        backgroundColor={colors.primary}
+        barStyle="light-content"
+      />
     </View>
   );
 };
@@ -432,7 +434,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   header: {
-    marginTop: 20,
+    marginTop: 40,
     width: "90%",
     alignSelf: "center",
     flexDirection: "row",

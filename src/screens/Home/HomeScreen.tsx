@@ -152,6 +152,7 @@ export const HomeScreen = ({ navigation, route }: Props) => {
         </Text>
         <TouchableOpacity
           style={styles.makeBtn}
+          disabled={!store.Ingredients}
           onPress={() => navigation.navigate("CustomTea", { store: store })}
         >
           <Text style={styles.makeBtnTxt}>Make</Text>
@@ -192,7 +193,7 @@ export const HomeScreen = ({ navigation, route }: Props) => {
         data={filteredProducts}
         maxToRenderPerBatch={8}
         initialNumToRender={8}
-        renderItem={({ item }) => <ProductCard item={item} />}
+        renderItem={({ item }) => <ProductCard item={item} store={store} />}
         keyExtractor={(item) => item.id!}
         numColumns={2}
         showsVerticalScrollIndicator={false}

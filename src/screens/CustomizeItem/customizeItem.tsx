@@ -1,13 +1,8 @@
-import {
-  AppStackParamList,
-  NavigationScreenProps,
-} from "../../navigation/AppNavigator";
+import { AppStackParamList } from "../../navigation/AppNavigator";
 import { Entypo, AntDesign } from "@expo/vector-icons";
 import { ButtonGroup } from "@rneui/themed";
-import { useFireStoreCreate } from "../../utils/Hooks";
-import { createCart } from "../../utils/Models";
 import { FirestoreCollections } from "../../utils/constants";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ScrollView,
   View,
@@ -36,85 +31,35 @@ export interface Props {
 }
 
 export const CustomizeItem = ({ navigation, route }: Props) => {
-  const { store } = route.params;
+  const { store, item } = route.params;
   const toast = useToast();
   const cartService = new FireStoreService<ICart>(FirestoreCollections.Carts);
-  const [sizeIndex, setSizeIndex] = useState(0);
-  const [iceIndex, setIceIndex] = useState(0);
-  const [sugarIndex, setSugarIndex] = useState(0);
-  const [teaIndex, setTeaIndex] = useState(0);
-  const [milkIndex, setMilkIndex] = useState(0);
-  const [toppingIndex, setToppingIndex] = useState(0);
-  const [jellyIndex, setJellyIndex] = useState(0);
+  const [ingredients, setIngredients] = useState([]);
   const [items, setItems] = useState(1);
 
-  const sizes = ["Small", "Large"];
-  const ices = ["No", "Little", "Normal", "A lot"];
-  const sugars = ["0%", "30%", "50%", "70%", "Regular"];
-  const teas = ["Black milk tea", "Jasmine green milk tea", "Caramel milk tea"];
-  const milks = [
-    "Black milk tea",
-    "Jasmine green milk tea",
-    "Caramel milk tea",
-  ];
-  const toppings = [
-    "Tapioca black",
-    "Tapioca white",
-    "Apple pearls",
-    "Pomegranate pearls",
-    "Grape pearls",
-    "Kiwi pearls",
-    "Strawberry pearls",
-    "Blueberry pearls",
-    "Raspberry pearls",
-    "Cherry pearls",
-    "Mango pearls",
-    "Passion fruit pearls",
-    "Peach pearls",
-    "Lychee pearls",
-    "Crème brûlée (+1€)",
-  ];
-  const jellies = [
-    "Jelly Mix",
-    "Fruit jelly",
-    "White jelly",
-    "Apple jelly",
-    "Lychee jelly",
-    "Mango jelly",
-  ];
-
-  const handleSizePress = (selectedIndex: number) => {
-    setSizeIndex(selectedIndex);
+  const handlePress = (i: number, index: number) => {
+    ingredients[index].selectedIndex = i;
+    setIngredients([...ingredients]);
   };
 
-  const handleIcePress = (selectedIndex: number) => {
-    setIceIndex(selectedIndex);
-  };
-
-  const handleSugarPress = (selectedIndex: number) => {
-    setSugarIndex(selectedIndex);
-  };
-
-  const handleTeaPress = (selectedIndex: number) => {
-    setTeaIndex(selectedIndex);
-  };
-
-  const handleMilkPress = (selectedIndex: number) => {
-    setMilkIndex(selectedIndex);
-  };
-
-  const handleToppingPress = (selectedIndex: number) => {
-    setToppingIndex(selectedIndex);
-  };
-
-  const handleJellyPress = (selectedIndex: number) => {
-    setJellyIndex(selectedIndex);
-  };
+  useEffect(() => {
+    var filteredIngredients = store.Ingredients
+      ? store.Ingredients.filter(
+          (ingredient: any) => ingredient.type === "nonCustom"
+        )
+      : [];
+    console.log(filteredIngredients);
+    setIngredients(
+      filteredIngredients.map((obj: any) => ({
+        ...obj,
+        selectedIndex: 0,
+      }))
+    );
+  }, []);
 
   // creat the cart if not exist
   const createCart = async () => {
     const deviceId = await DeviceId();
-    // console.log("deviceId", deviceId);
     const cart: ICart = {
       id: deviceId,
       storeId: store.store,
@@ -132,16 +77,16 @@ export const CustomizeItem = ({ navigation, route }: Props) => {
       cart = await cartService.getById(deviceId);
     }
 
-    product.size = sizes[sizeIndex];
-    product.ice = ices[iceIndex];
-    product.sugar = sugars[sugarIndex];
+    ingredients.map((val, i) => {
+      product[val.name] = val.values[val.selectedIndex];
+    });
+
     const cartItem: ICartItem = {
       quantity: items,
       price: (Number(product.price) * items).toString(),
       product: product,
+      itemType: "nonCustom",
     };
-
-    // console.log("cartItem", cartItem);
 
     await cartService.createInSubCollection<ICartItem>(
       cart?.Id,
@@ -173,7 +118,7 @@ export const CustomizeItem = ({ navigation, route }: Props) => {
         >
           <Entypo name="chevron-small-left" size={24} color="black" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{store.name}</Text>
+        <Text style={styles.headerTitle}>{item.name}</Text>
       </View>
       {/* <Image
         source={require("./../../assets/images/bubble-milk.png")}
@@ -192,7 +137,20 @@ export const CustomizeItem = ({ navigation, route }: Props) => {
           contentContainerStyle={{ paddingBottom: 150 }}
           showsVerticalScrollIndicator={false}
         >
-          <SelectionButtonGroup
+          {ingredients.length !== 0 &&
+            ingredients.map((val: any, i: number) => {
+              return (
+                <SelectionButtonGroup
+                  selectedIndex={val.selectedIndex}
+                  title={val.name}
+                  onPress={handlePress}
+                  buttons={val.values}
+                  index={i}
+                  key={i}
+                />
+              );
+            })}
+          {/* <SelectionButtonGroup
             selectedIndex={sizeIndex}
             title="Choose Size"
             onPress={handleSizePress}
@@ -209,7 +167,7 @@ export const CustomizeItem = ({ navigation, route }: Props) => {
             title="Choose Sugar"
             onPress={handleSugarPress}
             buttons={sugars}
-          />
+          /> */}
           <View style={{ width: "90%", alignSelf: "center" }}>
             <Text style={styles.itemLabel}>Item</Text>
             <View style={styles.itemsBtns}>
@@ -272,7 +230,7 @@ export const CustomizeItem = ({ navigation, route }: Props) => {
               marginTop: 5,
             }}
           >
-            ${store.price * items}
+            ${item.price * items}
           </Text>
         </View>
         <Button
@@ -288,7 +246,7 @@ export const CustomizeItem = ({ navigation, route }: Props) => {
             fontSize: 14,
             fontFamily: fonts.semiBold,
           }}
-          onPress={() => handleAddToCart(store)}
+          onPress={() => handleAddToCart(item)}
         />
       </View>
       <StatusBar backgroundColor={colors.primary} barStyle="light-content" />
@@ -299,8 +257,9 @@ export const CustomizeItem = ({ navigation, route }: Props) => {
 export const SelectionButtonGroup = (props: {
   selectedIndex: number;
   title: string;
-  onPress: (selectedIndex: number) => void;
+  onPress: (i: number, index: number) => void;
   buttons: string[];
+  index: number;
 }) => {
   return (
     <View style={{ paddingHorizontal: 10, paddingVertical: 5 }}>
@@ -321,7 +280,7 @@ export const SelectionButtonGroup = (props: {
         showsVerticalScrollIndicator={false}
       >
         <ButtonGroup
-          onPress={props.onPress}
+          onPress={(i) => props.onPress(i, props.index)}
           selectedIndex={props.selectedIndex}
           selectedButtonStyle={{
             backgroundColor: "#DBF4FF",

@@ -18,7 +18,7 @@ interface Props {
   item: IProduct;
 }
 
-export const ProductCard = ({ item }: Props) => {
+export const ProductCard = ({ item, store }: Props) => {
   const toast = useToast();
   const cartService = new FireStoreService<ICart>(FirestoreCollections.Carts);
   const navigation = useNavigation<NavigationProp<AppStackParamList>>();
@@ -128,7 +128,8 @@ export const ProductCard = ({ item }: Props) => {
             <TouchableOpacity
               onPress={() =>
                 navigation.navigate("CustomizeItem", {
-                  store: item,
+                  item: item,
+                  store: store,
                 })
               }
             >
