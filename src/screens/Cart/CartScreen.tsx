@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { FlatList, View, Text, StatusBar } from "react-native";
 import { AppStackParamList, TabParamList } from "../../navigation/AppNavigator";
 import { NavigationProp, RouteProp } from "@react-navigation/native";
@@ -10,16 +10,19 @@ import { ICart, ICartItem, createOrder } from "../../utils/Models";
 import { CartItem } from "./components/CartItem";
 import { useEffect, useState } from "react";
 import { faker } from "@faker-js/faker";
-import AsyncStorageService from "../../services/Storage";
 import { FireStoreService } from "../../services/FireStore";
 import { DeviceId, FirestoreCollections } from "../../utils/constants";
 import { useToast } from "react-native-toast-notifications";
+import userContext from "../../context/useContext";
 
 export interface Props {
   navigation: NavigationProp<AppStackParamList>;
   route: RouteProp<TabParamList, "Cart">;
 }
 export const CartScreen = ({ navigation, route }: Props) => {
+  const state = useContext(userContext);
+  let { storeData } = state.appState;
+  console.log("====state=====", storeData);
   const toast = useToast();
   const cartService = new FireStoreService<ICart>(FirestoreCollections.Carts);
   const [CartItems, setCartItems] = useState<ICartItem[]>([]);
@@ -82,6 +85,8 @@ export const CartScreen = ({ navigation, route }: Props) => {
       status: "pending",
       createdAt: new Date().toString(),
       orderType: "notCustom",
+      store_id: storeData.id,
+      storeName: storeData.name,
     });
 
     // console.log(oderCreated);

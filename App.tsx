@@ -8,6 +8,7 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ToastProvider } from "react-native-toast-notifications";
+import UseState from "./src/context/useState";
 
 // generate a random uuid
 
@@ -45,11 +46,13 @@ export default function App() {
   }
   return (
     <ToastProvider>
-      <SafeAreaProvider onLayout={onLayoutRootView}>
-        <ThemeProvider theme={theme}>
-          <AppNavigator />
-        </ThemeProvider>
-      </SafeAreaProvider>
+      <UseState>
+        <SafeAreaProvider onLayout={onLayoutRootView}>
+          <ThemeProvider theme={theme}>
+            <AppNavigator />
+          </ThemeProvider>
+        </SafeAreaProvider>
+      </UseState>
     </ToastProvider>
   );
 }

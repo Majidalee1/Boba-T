@@ -1,5 +1,5 @@
 import { NavigationProp, RouteProp } from "@react-navigation/native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   FlatList,
   StatusBar,
@@ -22,6 +22,7 @@ import { DeviceId } from "../../utils/constants";
 import { FireStoreService } from "../../services/FireStore";
 import { IUser } from "../../utils/Models";
 import { FirestoreCollections } from "../../utils/constants";
+import userContext from "../../context/useContext";
 
 const $container: ViewStyle = {
   flex: 1,
@@ -41,6 +42,8 @@ interface Props {
 }
 
 export const Stores = (props: Props) => {
+  const state = useContext(userContext);
+  console.log("=====>>state====", state.appState.storeData);
   const { navigation } = props;
   const usersService = new FireStoreService<IUser>(FirestoreCollections.Users);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -121,14 +124,15 @@ export const Stores = (props: Props) => {
       />
       <Button
         title={"Continue"}
-        onPress={() =>
+        onPress={() => {
+          state.dispatch({ payload: stores[selectedIndex], type: "store" });
           navigation.navigate("Tabs", {
             screen: "Home",
             params: {
               storeId: stores[selectedIndex].id,
             },
-          })
-        }
+          });
+        }}
       />
       <StatusBar
         translucent={false}

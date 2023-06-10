@@ -70,6 +70,7 @@ export const ProductCard = ({ item, store }: Props) => {
       onPress={() =>
         navigation.navigate("Details", {
           item: item,
+          store: store,
         })
       }
     >

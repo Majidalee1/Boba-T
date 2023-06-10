@@ -90,9 +90,9 @@ export interface IOrder {
   total: string;
   items: ICartItem[];
   status: string;
-  product: any;
   createdAt: any;
-  orderType:any
+  orderType: any;
+  storeName: string;
 }
 
 export const createOrder = async (payload: IOrder): Promise<IOrder> => {

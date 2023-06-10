@@ -22,6 +22,7 @@ export type AppStackParamList = {
   Store: undefined;
   Details: {
     item: any;
+    store: any;
   };
   Checkout: {
     order_number: string | number;
@@ -37,6 +38,7 @@ export type AppStackParamList = {
   };
   CustomizeItem: {
     store: any;
+    item: any;
   };
 };
 

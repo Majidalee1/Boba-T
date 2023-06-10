@@ -14,11 +14,6 @@ import { AppStackParamList } from "../../navigation/AppNavigator";
 import { Button } from "../../components/Button";
 import { colors } from "../../styles/colors";
 import { fonts } from "../../styles/fonts";
-import { DeviceId } from "../../utils/constants";
-import { FireStoreService } from "../../services/FireStore";
-import { FirestoreCollections } from "../../utils/constants";
-import { ICart, IProduct, ICartItem } from "../../utils/Models";
-import { Timestamp } from "firebase/firestore";
 import { useToast } from "react-native-toast-notifications";
 
 interface Props {
@@ -27,51 +22,15 @@ interface Props {
 }
 export const ProductDetails = ({ navigation, route }: Props) => {
   const toast = useToast();
-  let { item } = route.params;
-  const cartService = new FireStoreService<ICart>(FirestoreCollections.Carts);
-  // creat the cart if not exist
-  const createCart = async () => {
-    const deviceId = await DeviceId();
-    const cart: ICart = {
-      id: deviceId,
-      storeId: item.store,
-      deviceId: deviceId,
-      createdAt: Timestamp.now().toDate(),
-    };
-    return await cartService.create(cart);
-  };
-  const handleAddToCart = async (product: IProduct) => {
-    const deviceId = await DeviceId();
-    let cart = await cartService.getById(deviceId);
-    if (!cart) {
-      await createCart();
-      cart = await cartService.getById(deviceId);
-    }
-    console.log("cart", cart);
-    const cartItem: ICartItem = {
-      product: product,
-      quantity: 1,
-      price: product.price,
-    };
-    console.log("cartItem", cartItem);
-    const items = await cartService.createInSubCollection<ICartItem>(
-      cart?.Id,
-      FirestoreCollections.CartItems,
-      cartItem
-    );
-    toast.show("added successfully", {
-      type: "success",
-      placement: "bottom",
-      duration: 2000,
-      offset: 30,
-      animationType: "zoom-in",
-    });
-    console.log("items", items);
-  };
+  let { item, store } = route.params;
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn} onPress={()=>navigation.goBack()}>
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => navigation.goBack()}
+        >
           <Entypo name="chevron-small-left" size={24} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Details</Text>
@@ -100,9 +59,15 @@ export const ProductDetails = ({ navigation, route }: Props) => {
       </ScrollView>
       <Button
         title={"Add to Cart"}
+        // onPress={() =>
+        //   navigation.navigate("CustomizeItem", {
+        //     store: item,
+        //   })
+        // }
         onPress={() =>
           navigation.navigate("CustomizeItem", {
-            store: item,
+            item: item,
+            store: store,
           })
         }
       />
