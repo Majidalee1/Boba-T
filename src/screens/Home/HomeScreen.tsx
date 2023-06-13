@@ -10,6 +10,7 @@ import {
   Image,
   ImageBackground,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import { Header } from "../../components/Header";
 import { RowContainer } from "../../components/RowContainer";
@@ -199,6 +200,7 @@ export const HomeScreen = ({ navigation, route }: Props) => {
         numColumns={2}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: "5%" }}
+
       />
     </View>
   );

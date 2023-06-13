@@ -27,6 +27,8 @@ export const CartScreen = ({ navigation, route }: Props) => {
   const cartService = new FireStoreService<ICart>(FirestoreCollections.Carts);
   const [CartItems, setCartItems] = useState<ICartItem[]>([]);
   const [totalPrice, setTotalPrice] = useState<string>("0");
+  const [loader, setLoader] = useState(false);
+  // const [loader2, setLoader2] = useState(true);
 
   async function getCartItems() {
     const deviceId = await DeviceId();
@@ -71,6 +73,7 @@ export const CartScreen = ({ navigation, route }: Props) => {
   // on checkout generate order number
 
   const handleCheckout = async () => {
+    setLoader(true);
     const deviceId = await DeviceId();
     const order_number = faker.random.alphaNumeric(6);
     let total = 0;
@@ -95,6 +98,7 @@ export const CartScreen = ({ navigation, route }: Props) => {
       await cartService.delete(deviceId);
       // await AsyncStorageService.clear();
       setCartItems([]);
+      setLoader(false);
       navigation.navigate("Checkout", {
         order_number,
         items: CartItems,
@@ -193,6 +197,7 @@ export const CartScreen = ({ navigation, route }: Props) => {
           <Button
             title={`Proceed to Checkout $${totalPrice}`}
             onPress={() => handleCheckout()}
+            loader={loader}
           />
         </View>
       )}

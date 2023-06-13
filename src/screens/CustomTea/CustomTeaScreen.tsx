@@ -29,7 +29,6 @@ import { useToast } from "react-native-toast-notifications";
 import { FireStoreService } from "../../services/FireStore";
 import { Timestamp } from "firebase/firestore";
 import { Button } from "@rneui/base";
-import { createOrder, createCustomOrder, IOrder } from "../../utils/Models";
 import { faker } from "@faker-js/faker";
 
 export interface Props {
@@ -42,80 +41,10 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
   const toast = useToast();
   const cartService = new FireStoreService<ICart>(FirestoreCollections.Carts);
   const [ingredients, setIngredients] = useState([]);
-  const [sizeIndex, setSizeIndex] = useState(0);
-  const [iceIndex, setIceIndex] = useState(0);
-  const [sugarIndex, setSugarIndex] = useState(0);
-  const [teaIndex, setTeaIndex] = useState(0);
-  const [milkIndex, setMilkIndex] = useState(0);
-  const [toppingIndex, setToppingIndex] = useState(0);
-  const [jellyIndex, setJellyIndex] = useState(0);
   const [items, setItems] = useState(1);
-
-  const sizes = ["Small", "Large"];
-  const ices = ["No", "Little", "Normal", "A lot"];
-  const sugars = ["0%", "30%", "50%", "70%", "Regular"];
-  const teas = ["Black milk tea", "Jasmine green milk tea", "Caramel milk tea"];
-  const milks = [
-    "Black milk tea",
-    "Jasmine green milk tea",
-    "Caramel milk tea",
-  ];
-  const toppings = [
-    "Tapioca black",
-    "Tapioca white",
-    "Apple pearls",
-    "Pomegranate pearls",
-    "Grape pearls",
-    "Kiwi pearls",
-    "Strawberry pearls",
-    "Blueberry pearls",
-    "Raspberry pearls",
-    "Cherry pearls",
-    "Mango pearls",
-    "Passion fruit pearls",
-    "Peach pearls",
-    "Lychee pearls",
-    "Crème brûlée (+1€)",
-  ];
-  const jellies = [
-    "Jelly Mix",
-    "Fruit jelly",
-    "White jelly",
-    "Apple jelly",
-    "Lychee jelly",
-    "Mango jelly",
-  ];
-
-  const handleSizePress = (selectedIndex: number) => {
-    setSizeIndex(selectedIndex);
-  };
-
-  const handleIcePress = (selectedIndex: number) => {
-    setIceIndex(selectedIndex);
-  };
-
-  const handleSugarPress = (selectedIndex: number) => {
-    setSugarIndex(selectedIndex);
-  };
-
-  const handleTeaPress = (selectedIndex: number) => {
-    setTeaIndex(selectedIndex);
-  };
-
-  const handleMilkPress = (selectedIndex: number) => {
-    setMilkIndex(selectedIndex);
-  };
-
-  const handleToppingPress = (selectedIndex: number) => {
-    setToppingIndex(selectedIndex);
-  };
-
-  const handleJellyPress = (selectedIndex: number) => {
-    setJellyIndex(selectedIndex);
-  };
+  const [loader, setLoader] = useState(false);
 
   const handlePress = (i: number, index: number) => {
-    // console.log(index);
     ingredients[index].selectedIndex = i;
     setIngredients([...ingredients]);
   };
@@ -150,6 +79,7 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
   };
 
   const handleAddToCart = async () => {
+    setLoader(true);
     const deviceId = await DeviceId();
     let cart = await cartService.getById(deviceId);
     if (!cart) {
@@ -168,7 +98,7 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
     console.log(product);
     const cartItem: ICartItem = {
       quantity: items,
-      price: (10 * items).toString(),
+      price: (Number(store.price) * items).toString(),
       product: product,
       itemType: "custom",
     };
@@ -178,6 +108,7 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
       FirestoreCollections.CartItems,
       cartItem
     );
+    setLoader(false);
     toast.show("added to cart", {
       type: "success",
       placement: "bottom",
@@ -187,34 +118,6 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
     });
     navigation.navigate("Tabs", { screen: "Cart" });
   };
-
-  // const handleCheckout = async () => {
-  //   const order_number = faker.random.alphaNumeric(6);
-  //   var product = {};
-  //   ingredients.map((val, i) => {
-  //     product[val.name] = val.values[val.selectedIndex];
-  //   });
-  //   product.name = "Pre made drink";
-  //   product.price = (10 * items).toString();
-  //   product.image =
-  //     "https://firebasestorage.googleapis.com/v0/b/bubble-tea-f3d52.appspot.com/o/images%2Fbubble-milk-tea-pearl-milk-tea-png%20copya%201.png?alt=media&token=12cfce12-e8b6-42b4-8390-169ad6788095&_gl=1*t8qeer*_ga*NTY5NjcyMzQxLjE2NjcyOTg2NDI.*_ga_CW55HF8NVT*MTY4NTYwNzUxNC4yOS4xLjE2ODU2MDc2MDIuMC4wLjA.";
-
-  //   console.log(product);
-  //   const oderCreated = await createOrder<IOrder>({
-  //     order_number,
-  //     product,
-  //     total: (10 * items).toString(),
-  //     status: "pending",
-  //     createdAt: new Date().toString(),
-  //     orderType: "custom",
-  //   });
-
-  //   if (oderCreated) {
-  //     navigation.navigate("Checkout", {
-  //       order_number: order_number,
-  //     });
-  //   }
-  // };
 
   return (
     <View
@@ -343,6 +246,8 @@ export const CustomTeaScreen = ({ navigation, route }: Props) => {
             fontFamily: fonts.semiBold,
           }}
           onPress={() => handleAddToCart()}
+          loading={loader}
+          disabled={loader}
         />
       </View>
       <StatusBar

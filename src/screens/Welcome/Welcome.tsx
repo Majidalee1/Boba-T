@@ -25,7 +25,11 @@ interface Props {
 export const Welcome = (props: Props) => {
   useEffect(() => {
     setTimeout(() => {
-      props.navigation.navigate("Store");
+      // props.navigation.navigate("Store");
+      props.navigation.reset({
+        index: 0,
+        routes: [{ name: "Store" }],
+      });
     }, 3000);
   }, []);
   return (

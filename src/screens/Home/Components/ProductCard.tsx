@@ -73,6 +73,7 @@ export const ProductCard = ({ item, store }: Props) => {
           store: store,
         })
       }
+      disabled={!store.Ingredients}
     >
       <View
         style={{
@@ -127,6 +128,7 @@ export const ProductCard = ({ item, store }: Props) => {
               {item.price}
             </Text>
             <TouchableOpacity
+              disabled={!store.Ingredients}
               onPress={() =>
                 navigation.navigate("CustomizeItem", {
                   item: item,

@@ -36,6 +36,7 @@ export const CustomizeItem = ({ navigation, route }: Props) => {
   const cartService = new FireStoreService<ICart>(FirestoreCollections.Carts);
   const [ingredients, setIngredients] = useState([]);
   const [items, setItems] = useState(1);
+  const [loader, setLoader] = useState(false);
 
   const handlePress = (i: number, index: number) => {
     ingredients[index].selectedIndex = i;
@@ -62,7 +63,7 @@ export const CustomizeItem = ({ navigation, route }: Props) => {
     const deviceId = await DeviceId();
     const cart: ICart = {
       id: deviceId,
-      storeId: store.store,
+      storeId: store.id,
       deviceId: deviceId,
       createdAt: Timestamp.now().toDate(),
     };
@@ -70,6 +71,7 @@ export const CustomizeItem = ({ navigation, route }: Props) => {
   };
 
   const handleAddToCart = async (product: IProduct) => {
+    setLoader(true);
     const deviceId = await DeviceId();
     let cart = await cartService.getById(deviceId);
     if (!cart) {
@@ -80,6 +82,7 @@ export const CustomizeItem = ({ navigation, route }: Props) => {
     ingredients.map((val, i) => {
       product[val.name] = val.values[val.selectedIndex];
     });
+    console.log(product);
 
     const cartItem: ICartItem = {
       quantity: items,
@@ -93,6 +96,7 @@ export const CustomizeItem = ({ navigation, route }: Props) => {
       FirestoreCollections.CartItems,
       cartItem
     );
+    setLoader(false);
     toast.show("added to cart", {
       type: "success",
       placement: "bottom",
@@ -247,6 +251,7 @@ export const CustomizeItem = ({ navigation, route }: Props) => {
             fontFamily: fonts.semiBold,
           }}
           onPress={() => handleAddToCart(item)}
+          loading={loader}
         />
       </View>
       <StatusBar backgroundColor={colors.primary} barStyle="light-content" />

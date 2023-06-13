@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
   ViewStyle,
+  ActivityIndicator,
 } from "react-native";
 import { WithLocalSvg } from "react-native-svg";
 import { Button } from "../../components/Button";
@@ -49,6 +50,7 @@ export const Stores = (props: Props) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [stores, setStores] = useFireStore<IStore>("Stores");
   const [name, setName] = useState<string>("");
+  const [loader, setLoader] = useState(true);
 
   console.log("stores", stores);
 
@@ -121,6 +123,28 @@ export const Stores = (props: Props) => {
           borderRadius: 10,
           paddingBottom: 10,
         }}
+        ListEmptyComponent={() => (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              height: 300,
+            }}
+          >
+            <ActivityIndicator color={colors.primary} />
+            {/* <Text
+              style={{
+                fontFamily: fonts.regular,
+                color: colors.text_primary,
+                fontSize: 14,
+                textAlign: "center",
+              }}
+            >
+              There is no any order related to
+            </Text> */}
+          </View>
+        )}
       />
       <Button
         title={"Continue"}
